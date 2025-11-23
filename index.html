@@ -3,17 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payboss - Executive Dashboard</title>
+    <title>Payboss - Super Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', system-ui, sans-serif; background-color: #f1f5f9; }
-        .glass-card { background: white; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); border: 1px solid #e2e8f0; }
-        .shift-active { border-bottom: 4px solid #3b82f6; }
-        /* Animasi Transisi */
-        .fade-in { animation: fadeIn 0.5s ease-in; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
+        .glass-card { background: white; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; }
+        
+        /* Custom Tab Style */
+        .nav-item { cursor: pointer; transition: all 0.3s ease; border-bottom: 3px solid transparent; color: #64748b; }
+        .nav-item:hover { color: #1e293b; }
+        .nav-item.active { border-bottom-color: #3b82f6; color: #3b82f6; font-weight: bold; }
+        
+        .fade-in { animation: fadeIn 0.3s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body class="text-slate-800 min-h-screen relative pb-20">
@@ -22,226 +26,251 @@
     <div id="login-modal" class="fixed inset-0 bg-slate-900 bg-opacity-95 z-[9999] flex items-center justify-center backdrop-blur-sm transition-all duration-300">
         <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm text-center">
             <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-user-shield text-2xl text-blue-600"></i>
+                <i class="fas fa-user-tie text-2xl text-blue-600"></i>
             </div>
-            <h2 class="text-2xl font-bold text-slate-800">Manager Access</h2>
-            <p class="text-slate-500 text-sm mb-6">Restricted Area. Authorized Personnel Only.</p>
+            <h2 class="text-2xl font-bold text-slate-800">Manager Area</h2>
+            <p class="text-slate-500 text-sm mb-6">Silakan login untuk mengakses data.</p>
             <form id="login-form" class="space-y-4">
-                <input type="email" id="email" required placeholder="Email Staff" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-                <input type="password" id="password" required placeholder="Password" class="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-                <div id="login-error" class="text-red-500 text-xs hidden font-bold">Akses Ditolak.</div>
-                <button type="submit" id="btn-login" class="w-full py-3 bg-slate-800 text-white rounded-lg font-bold hover:bg-slate-700 transition shadow-lg">Login Dashboard</button>
+                <input type="email" id="email" required placeholder="Email Staff" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                <input type="password" id="password" required placeholder="Password" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                <div id="login-error" class="text-red-500 text-xs hidden font-bold bg-red-50 p-2 rounded">Email atau password salah.</div>
+                <button type="submit" id="btn-login" class="w-full py-3 bg-slate-800 text-white rounded-lg font-bold hover:bg-slate-700 transition shadow-lg">Masuk Dashboard</button>
             </form>
         </div>
     </div>
 
     <!-- MAIN CONTENT -->
-    <div id="main-content" class="filter blur-md pointer-events-none transition duration-500 max-w-7xl mx-auto p-4 md:p-6 fade-in">
+    <div id="main-content" class="filter blur-md pointer-events-none transition duration-500 max-w-7xl mx-auto p-4 md:p-6">
         
-        <!-- Top Bar -->
-        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
             <div>
                 <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
-                    <i class="fas fa-chart-line text-blue-600"></i> Executive Dashboard
+                    <i class="fas fa-chart-pie text-blue-600"></i> Payboss Analytics
                 </h1>
-                <p class="text-slate-500 text-sm mt-1">Real-time Financial Monitoring</p>
+                <p class="text-slate-500 text-sm">Laporan Harian & Kontrol Keuangan</p>
             </div>
-            <div class="flex items-center gap-3 bg-white p-2 rounded-xl shadow-sm border border-slate-200">
-                <div class="px-4 border-r border-slate-200">
+            <div class="flex items-center gap-3">
+                <div class="bg-white px-4 py-2 rounded-lg shadow border text-right">
                     <p class="text-[10px] uppercase font-bold text-slate-400">Tanggal Laporan</p>
                     <p id="header-date" class="font-bold text-sm text-blue-600">Loading...</p>
                 </div>
-                <button onclick="downloadCSV()" class="p-2 text-slate-600 hover:text-green-600 hover:bg-green-50 rounded-lg transition" title="Download Excel">
-                    <i class="fas fa-file-excel text-xl"></i>
-                </button>
-                <button id="btn-logout" class="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition" title="Logout">
-                    <i class="fas fa-sign-out-alt text-xl"></i>
-                </button>
+                <button id="btn-logout" class="p-2 text-red-600 hover:bg-red-50 rounded-lg border border-red-200" title="Keluar"><i class="fas fa-sign-out-alt"></i></button>
             </div>
         </div>
 
-        <!-- SHIFT CARDS -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <!-- Shift 1 -->
-            <div class="glass-card p-5 relative overflow-hidden group hover:border-yellow-400 transition">
-                <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition"><i class="fas fa-sun text-6xl text-yellow-500"></i></div>
-                <div class="flex justify-between items-center mb-4">
-                    <span class="bg-yellow-100 text-yellow-800 text-xs font-bold px-2 py-1 rounded border border-yellow-200">08:00 - 16:00</span>
-                    <span class="text-xs font-bold text-slate-400">SHIFT 1</span>
-                </div>
-                <h3 class="text-slate-500 text-sm font-medium">Total Omset</h3>
-                <p id="s1-total" class="text-3xl font-bold text-slate-800 mb-4">Rp 0</p>
-                <div class="flex gap-2">
-                    <div class="flex-1 bg-slate-50 p-2 rounded border border-slate-100">
-                        <p class="text-[10px] text-slate-400 uppercase">Cash</p>
-                        <p id="s1-cash" class="font-bold text-slate-700 text-sm">Rp 0</p>
-                    </div>
-                    <div class="flex-1 bg-green-50 p-2 rounded border border-green-100">
-                        <p class="text-[10px] text-green-600 uppercase">QRIS</p>
-                        <p id="s1-qris" class="font-bold text-green-700 text-sm">Rp 0</p>
-                    </div>
-                </div>
+        <!-- NAVIGATION TABS -->
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 mb-6 flex overflow-x-auto">
+            <div onclick="switchTab('ops')" id="tab-ops" class="nav-item active flex-1 py-4 text-center min-w-[150px]">
+                <i class="fas fa-cash-register mr-2"></i> Closing & Bank
             </div>
-
-            <!-- Shift 2 -->
-            <div class="glass-card p-5 relative overflow-hidden group hover:border-orange-400 transition">
-                <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition"><i class="fas fa-cloud-sun text-6xl text-orange-500"></i></div>
-                <div class="flex justify-between items-center mb-4">
-                    <span class="bg-orange-100 text-orange-800 text-xs font-bold px-2 py-1 rounded border border-orange-200">16:00 - 00:00</span>
-                    <span class="text-xs font-bold text-slate-400">SHIFT 2</span>
-                </div>
-                <h3 class="text-slate-500 text-sm font-medium">Total Omset</h3>
-                <p id="s2-total" class="text-3xl font-bold text-slate-800 mb-4">Rp 0</p>
-                <div class="flex gap-2">
-                    <div class="flex-1 bg-slate-50 p-2 rounded border border-slate-100">
-                        <p class="text-[10px] text-slate-400 uppercase">Cash</p>
-                        <p id="s2-cash" class="font-bold text-slate-700 text-sm">Rp 0</p>
-                    </div>
-                    <div class="flex-1 bg-green-50 p-2 rounded border border-green-100">
-                        <p class="text-[10px] text-green-600 uppercase">QRIS</p>
-                        <p id="s2-qris" class="font-bold text-green-700 text-sm">Rp 0</p>
-                    </div>
-                </div>
+            <div onclick="switchTab('analytics')" id="tab-analytics" class="nav-item flex-1 py-4 text-center min-w-[150px]">
+                <i class="fas fa-chart-line mr-2"></i> Analisis Toko
             </div>
-
-            <!-- Shift 3 -->
-            <div class="glass-card p-5 relative overflow-hidden group hover:border-blue-400 transition">
-                <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition"><i class="fas fa-moon text-6xl text-blue-500"></i></div>
-                <div class="flex justify-between items-center mb-4">
-                    <span class="bg-blue-100 text-blue-800 text-xs font-bold px-2 py-1 rounded border border-blue-200">00:00 - 08:00</span>
-                    <span class="text-xs font-bold text-slate-400">SHIFT 3</span>
-                </div>
-                <h3 class="text-slate-500 text-sm font-medium">Total Omset</h3>
-                <p id="s3-total" class="text-3xl font-bold text-slate-800 mb-4">Rp 0</p>
-                <div class="flex gap-2">
-                    <div class="flex-1 bg-slate-50 p-2 rounded border border-slate-100">
-                        <p class="text-[10px] text-slate-400 uppercase">Cash</p>
-                        <p id="s3-cash" class="font-bold text-slate-700 text-sm">Rp 0</p>
-                    </div>
-                    <div class="flex-1 bg-green-50 p-2 rounded border border-green-100">
-                        <p class="text-[10px] text-green-600 uppercase">QRIS</p>
-                        <p id="s3-qris" class="font-bold text-green-700 text-sm">Rp 0</p>
-                    </div>
-                </div>
+            <div onclick="switchTab('data')" id="tab-data" class="nav-item flex-1 py-4 text-center min-w-[150px]">
+                <i class="fas fa-table mr-2"></i> Data Transaksi
             </div>
         </div>
 
-        <!-- ANALYTICS SECTION -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            <!-- CHART: Traffic Jam -->
-            <div class="glass-card p-6 lg:col-span-2">
-                <h3 class="font-bold text-slate-700 mb-4 flex items-center gap-2">
-                    <i class="fas fa-clock text-blue-500"></i> Tren Penjualan Per Jam
-                </h3>
-                <div class="h-64">
-                    <canvas id="hourlyChart"></canvas>
-                </div>
-            </div>
-
-            <!-- TOP ITEMS: Best Seller -->
-            <div class="glass-card p-6">
-                <h3 class="font-bold text-slate-700 mb-4 flex items-center gap-2">
-                    <i class="fas fa-crown text-yellow-500"></i> Top Menu Hari Ini
-                </h3>
-                <div class="overflow-y-auto h-64 pr-2 space-y-3" id="top-items-list">
-                    <!-- Item List Injected Here -->
-                    <p class="text-center text-slate-400 text-sm mt-10">Belum ada data penjualan.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- CLOSING & REKONSILIASI -->
-        <div class="glass-card overflow-hidden mb-8">
-            <div class="bg-slate-800 p-4 flex justify-between items-center">
-                <h3 class="text-white font-bold flex items-center gap-2">
-                    <i class="fas fa-calculator"></i> Closing & Rekonsiliasi
-                </h3>
-                <button onclick="resetCalculator()" class="text-xs bg-slate-600 hover:bg-slate-500 text-white px-3 py-1 rounded transition">Reset Form</button>
-            </div>
+        <!-- === TAB 1: OPERASIONAL (CLOSING & BANK) === -->
+        <div id="view-ops" class="tab-view fade-in">
             
-            <div class="p-6">
-                <!-- Filter Shift [FIXED BUTTON LOGIC] -->
-                <div class="flex flex-wrap gap-2 mb-6 bg-slate-100 p-2 rounded-lg">
-                    <button onclick="setShift('08:00', '16:00', this)" class="shift-btn flex-1 py-2 rounded-md text-sm font-bold text-slate-600 hover:bg-white hover:shadow-sm transition">Shift 1</button>
-                    <button onclick="setShift('16:00', '23:59', this)" class="shift-btn flex-1 py-2 rounded-md text-sm font-bold text-slate-600 hover:bg-white hover:shadow-sm transition">Shift 2</button>
-                    <button onclick="setShift('00:00', '08:00', this)" class="shift-btn flex-1 py-2 rounded-md text-sm font-bold text-slate-600 hover:bg-white hover:shadow-sm transition">Shift 3</button>
-                    <button onclick="setShift('00:00', '23:59', this)" class="shift-btn flex-1 py-2 rounded-md text-sm font-bold text-blue-600 bg-white shadow-sm">Full Day</button>
+            <!-- Shift Summaries Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <!-- Shift 1 -->
+                <div class="glass-card p-5 border-l-4 border-yellow-400 relative overflow-hidden group">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-xs font-bold text-slate-400 uppercase">Shift 1 (Pagi)</span>
+                            <div class="text-2xl font-bold text-slate-800 mt-1" id="s1-total">Rp 0</div>
+                        </div>
+                        <span class="bg-yellow-100 text-yellow-800 text-[10px] px-2 py-1 rounded font-bold">08:00 - 16:00</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 mt-4 text-xs border-t pt-2 border-slate-100">
+                        <div class="bg-slate-50 p-1.5 rounded">Cash: <span id="s1-cash" class="font-bold text-slate-700">0</span></div>
+                        <div class="bg-green-50 p-1.5 rounded">QRIS: <span id="s1-qris" class="font-bold text-green-700">0</span></div>
+                    </div>
                 </div>
+                <!-- Shift 2 -->
+                <div class="glass-card p-5 border-l-4 border-orange-400 relative overflow-hidden group">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-xs font-bold text-slate-400 uppercase">Shift 2 (Sore)</span>
+                            <div class="text-2xl font-bold text-slate-800 mt-1" id="s2-total">Rp 0</div>
+                        </div>
+                        <span class="bg-orange-100 text-orange-800 text-[10px] px-2 py-1 rounded font-bold">16:00 - 00:00</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 mt-4 text-xs border-t pt-2 border-slate-100">
+                        <div class="bg-slate-50 p-1.5 rounded">Cash: <span id="s2-cash" class="font-bold text-slate-700">0</span></div>
+                        <div class="bg-green-50 p-1.5 rounded">QRIS: <span id="s2-qris" class="font-bold text-green-700">0</span></div>
+                    </div>
+                </div>
+                <!-- Shift 3 -->
+                <div class="glass-card p-5 border-l-4 border-blue-500 relative overflow-hidden group">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-xs font-bold text-slate-400 uppercase">Shift 3 (Malam)</span>
+                            <div class="text-2xl font-bold text-slate-800 mt-1" id="s3-total">Rp 0</div>
+                        </div>
+                        <span class="bg-blue-100 text-blue-800 text-[10px] px-2 py-1 rounded font-bold">00:00 - 08:00</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 mt-4 text-xs border-t pt-2 border-slate-100">
+                        <div class="bg-slate-50 p-1.5 rounded">Cash: <span id="s3-cash" class="font-bold text-slate-700">0</span></div>
+                        <div class="bg-green-50 p-1.5 rounded">QRIS: <span id="s3-qris" class="font-bold text-green-700">0</span></div>
+                    </div>
+                </div>
+            </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <!-- Input -->
-                    <div class="space-y-4 border-r border-slate-100 pr-0 lg:pr-8">
-                        <div class="flex justify-between items-center mb-2">
-                            <h4 class="font-bold text-slate-700">Input Fisik (Kasir)</h4>
-                            <span class="text-[10px] text-blue-600 bg-blue-50 px-2 py-0.5 rounded">Wajib Isi</span>
-                        </div>
-                        <div>
-                            <label class="text-xs font-bold text-slate-500 uppercase">Modal Awal</label>
-                            <input type="number" id="input-modal-awal" oninput="calculateClosing()" class="w-full p-2 border border-slate-300 rounded focus:border-blue-500 outline-none text-right font-mono" placeholder="0">
-                        </div>
-                        <div>
-                            <label class="text-xs font-bold text-slate-500 uppercase">Total Uang di Laci (Akhir)</label>
-                            <input type="number" id="input-fisik-akhir" oninput="calculateClosing()" class="w-full p-2 border-2 border-blue-500 rounded focus:ring-2 focus:ring-blue-100 outline-none text-right font-mono font-bold text-lg text-slate-800" placeholder="0">
-                        </div>
-                        <div>
-                            <label class="text-xs font-bold text-slate-500 uppercase">Pengeluaran / Bon</label>
-                            <input type="number" id="input-pengeluaran" oninput="calculateClosing()" class="w-full p-2 border border-slate-300 rounded focus:border-orange-500 outline-none text-right font-mono text-orange-600" placeholder="0">
-                        </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Closing Calculator -->
+                <div class="glass-card p-6">
+                    <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+                        <h3 class="font-bold text-slate-700 flex items-center gap-2"><i class="fas fa-calculator text-blue-500"></i> Closing Kasir</h3>
+                        <button onclick="resetCalculator()" class="text-xs bg-slate-200 hover:bg-slate-300 px-3 py-1 rounded transition">Reset Form</button>
+                    </div>
+                    
+                    <!-- Shift Selector (FIXED BUTTONS) -->
+                    <div class="flex gap-2 mb-4 overflow-x-auto pb-2">
+                        <button onclick="setShift('08:00', '16:00', this)" class="shift-btn flex-1 py-2 px-3 rounded text-xs font-bold border transition text-slate-600 hover:bg-blue-50">S1 (08-16)</button>
+                        <button onclick="setShift('16:00', '23:59', this)" class="shift-btn flex-1 py-2 px-3 rounded text-xs font-bold border transition text-slate-600 hover:bg-blue-50">S2 (16-00)</button>
+                        <button onclick="setShift('00:00', '08:00', this)" class="shift-btn flex-1 py-2 px-3 rounded text-xs font-bold border transition text-slate-600 hover:bg-blue-50">S3 (00-08)</button>
+                        <button onclick="setShift('00:00', '23:59', this)" class="shift-btn flex-1 py-2 px-3 rounded text-xs font-bold bg-blue-600 text-white shadow-md border-blue-600">ALL</button>
                     </div>
 
-                    <!-- System Data -->
-                    <div class="space-y-4 border-r border-slate-100 pr-0 lg:pr-8">
-                        <h4 class="font-bold text-slate-700 mb-2">Data Sistem (Otomatis)</h4>
-                        <div class="flex justify-between items-center p-3 bg-slate-50 rounded">
-                            <span class="text-sm text-slate-600">Total Cash</span>
-                            <span id="system-cash-display" class="font-bold text-slate-800">Rp 0</span>
+                    <div class="space-y-4">
+                        <!-- Inputs -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Modal Awal</label>
+                                <input type="number" id="input-modal-awal" oninput="calculateClosing()" class="w-full p-2 border rounded text-right font-mono text-sm outline-none focus:border-blue-500" placeholder="0">
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Bon / Pengeluaran</label>
+                                <input type="number" id="input-pengeluaran" oninput="calculateClosing()" class="w-full p-2 border rounded text-right font-mono text-sm text-orange-600 outline-none focus:border-orange-500" placeholder="0">
+                            </div>
                         </div>
-                        <div class="flex justify-between items-center p-3 bg-green-50 rounded">
-                            <span class="text-sm text-green-700">Total QRIS</span>
-                            <span id="system-qris-display" class="font-bold text-green-700">Rp 0</span>
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Total Uang Fisik (Hitungan Akhir)</label>
+                            <input type="number" id="input-fisik-akhir" oninput="calculateClosing()" class="w-full p-3 border-2 border-blue-200 rounded text-right font-bold text-lg outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" placeholder="0">
                         </div>
-                        <div class="p-3 bg-blue-50 rounded border border-blue-100 mt-2">
-                            <p class="text-[10px] text-blue-500 uppercase font-bold">Rumus Sistem</p>
-                            <div class="flex justify-between items-center mt-1">
-                                <span class="text-xs text-blue-800">Pendapatan Bersih Fisik:</span>
-                                <span id="calculated-physical-revenue" class="font-bold text-blue-700">Rp 0</span>
+                        
+                        <!-- Hasil Rekonsiliasi -->
+                        <div class="bg-slate-50 p-4 rounded-xl border mt-2">
+                            <div class="flex justify-between text-xs mb-2">
+                                <span class="text-slate-500">Target Sistem (Cash):</span>
+                                <span id="system-cash-display" class="font-bold text-slate-700">Rp 0</span>
+                            </div>
+                            <!-- FIXED: Added missing element -->
+                            <div class="flex justify-between text-xs mb-2 border-b border-slate-200 pb-2">
+                                <span class="text-slate-500">Target Fisik (Laci - Modal + Bon):</span>
+                                <span id="calculated-physical-revenue" class="font-bold text-blue-600">Rp 0</span>
+                            </div>
+                            <div class="flex justify-between items-center pt-2">
+                                <span class="font-bold text-slate-700 text-sm">Selisih (Variance):</span>
+                                <div class="text-right">
+                                    <span id="variance-amount" class="block font-black text-xl text-slate-400">Rp 0</span>
+                                    <span id="variance-status" class="text-[10px] bg-slate-200 px-2 py-0.5 rounded text-slate-500 font-bold">Menunggu Input</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bank Control -->
+                <div class="glass-card p-6">
+                    <h3 class="font-bold text-slate-700 mb-4 border-b pb-2 flex items-center gap-2">
+                        <i class="fas fa-university text-green-600"></i> Kontrol Bank & QRIS
+                    </h3>
+                    
+                    <!-- QRIS Monitoring -->
+                    <div class="bg-green-50 p-4 rounded-xl border border-green-100 mb-6">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs font-bold text-green-800 uppercase">Total QRIS Hari Ini (Gross)</span>
+                            <i class="fas fa-qrcode text-green-600 opacity-50"></i>
+                        </div>
+                        <div class="flex justify-between items-end">
+                            <span id="bank-qris-system" class="text-2xl font-black text-green-700">Rp 0</span>
+                            <div class="text-right">
+                                <p class="text-[10px] text-green-600">Est. Bersih (MDR 0.7%)</p>
+                                <p id="est-net-receive" class="font-bold text-green-800">Rp 0</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Result -->
-                    <div class="flex flex-col justify-center text-center">
-                        <h4 class="font-bold text-slate-700 mb-4">Hasil Rekonsiliasi</h4>
-                        <div id="result-box" class="p-6 rounded-2xl bg-slate-100 border-2 border-slate-200 transition-all duration-300">
-                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Selisih (Variance)</p>
-                            <div id="variance-amount" class="text-3xl font-black text-slate-400 mb-2">Rp 0</div>
-                            <span id="variance-status" class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-slate-200 text-slate-500">Menunggu Input</span>
+                    <!-- Expense Form -->
+                    <form onsubmit="submitBankExpense(event)" class="space-y-3 bg-white p-1 rounded">
+                        <p class="text-xs font-bold text-slate-400 uppercase">Catat Pengeluaran Transfer</p>
+                        <div class="flex gap-2">
+                            <input type="text" id="expense-desc" required placeholder="Ket (Misal: Beli Gula)" class="flex-1 p-2 border rounded text-sm outline-none focus:border-blue-500">
+                            <input type="number" id="expense-amount" required placeholder="Rp" class="w-24 p-2 border rounded text-sm outline-none focus:border-blue-500">
+                        </div>
+                        <button type="submit" id="btn-save-expense" class="w-full bg-slate-800 text-white py-2 rounded text-xs font-bold hover:bg-slate-700 transition">Simpan Catatan</button>
+                    </form>
+                    
+                    <!-- Expense List -->
+                    <div class="mt-4">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase mb-2">Riwayat Pengeluaran Hari Ini</p>
+                        <div class="max-h-32 overflow-y-auto space-y-1 pr-1" id="bank-expense-list">
+                            <p class="text-center text-xs text-slate-300 italic mt-4">Memuat data...</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- TABLE TRANSAKSI -->
-        <div class="glass-card overflow-hidden">
-            <div class="p-4 border-b border-slate-100">
-                <h3 class="font-bold text-slate-700">Rincian Transaksi</h3>
+        <!-- === TAB 2: ANALISIS (GRAFIK & TOP MENU) === -->
+        <div id="view-analytics" class="tab-view hidden fade-in">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- Grafik Jam Sibuk -->
+                <div class="glass-card p-6 lg:col-span-2">
+                    <h3 class="font-bold text-slate-700 mb-4 flex items-center gap-2">
+                        <i class="fas fa-clock text-blue-500"></i> Jam Paling Ramai (Traffic)
+                    </h3>
+                    <div class="h-80 w-full">
+                        <canvas id="hourlyChart"></canvas>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-2 text-center">*Grafik menunjukkan total nilai penjualan per jam.</p>
+                </div>
+
+                <!-- Top Menu -->
+                <div class="glass-card p-6">
+                    <h3 class="font-bold text-slate-700 mb-4 flex items-center gap-2">
+                        <i class="fas fa-crown text-yellow-500"></i> Menu Terlaris
+                    </h3>
+                    <div class="space-y-2 overflow-y-auto h-80 pr-2" id="top-items-list">
+                        <p class="text-center text-slate-400 text-sm mt-10">Memuat data...</p>
+                    </div>
+                </div>
+
             </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm">
-                    <thead class="bg-slate-50 text-slate-500 uppercase text-xs font-bold">
-                        <tr>
-                            <th class="p-4">Waktu</th>
-                            <th class="p-4">Customer</th>
-                            <th class="p-4">Items</th> <!-- NEW -->
-                            <th class="p-4">Metode</th>
-                            <th class="p-4 text-right">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody id="transaction-list" class="divide-y divide-slate-100 text-slate-600">
-                        <tr><td colspan="5" class="p-6 text-center italic text-slate-400">Memuat data...</td></tr>
-                    </tbody>
-                </table>
+        </div>
+
+        <!-- === TAB 3: DATA (TABEL) === -->
+        <div id="view-data" class="tab-view hidden fade-in">
+            <div class="glass-card overflow-hidden">
+                <div class="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+                    <h3 class="font-bold text-slate-700 flex items-center gap-2"><i class="fas fa-list"></i> Rincian Transaksi</h3>
+                    <button onclick="downloadCSV()" class="text-xs bg-green-600 text-white px-3 py-2 rounded font-bold hover:bg-green-700 flex items-center gap-2 shadow transition">
+                        <i class="fas fa-file-excel"></i> Download CSV
+                    </button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-white text-slate-500 text-xs uppercase font-bold border-b">
+                            <tr>
+                                <th class="p-4 whitespace-nowrap">Waktu</th>
+                                <th class="p-4 whitespace-nowrap">Customer</th>
+                                <th class="p-4 whitespace-nowrap">Items</th>
+                                <th class="p-4 whitespace-nowrap">Metode</th>
+                                <th class="p-4 whitespace-nowrap text-right">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transaction-list" class="divide-y divide-slate-100 text-slate-600">
+                            <tr><td colspan="5" class="p-6 text-center italic text-slate-400">Memuat data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -252,7 +281,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, collection, query, where, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, collection, query, where, onSnapshot, orderBy, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
         const firebaseConfig = {
@@ -269,17 +298,18 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // Global State
+        // State
         let allOrdersToday = [];
         let systemCashTotal = 0;
+        let systemQrisTotalFullDay = 0;
         let chartInstance = null;
 
-        // AUTH Logic
+        // --- AUTH ---
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 document.getElementById('login-modal').classList.add('hidden');
                 document.getElementById('main-content').classList.remove('filter', 'blur-md', 'pointer-events-none');
-                listenToData();
+                initDashboard();
             } else {
                 document.getElementById('login-modal').classList.remove('hidden');
                 document.getElementById('main-content').classList.add('filter', 'blur-md', 'pointer-events-none');
@@ -288,177 +318,182 @@
 
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('btn-login');
-            btn.textContent = "Verifying..."; btn.disabled = true;
-            try {
-                await signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value);
-            } catch (error) {
-                document.getElementById('login-error').classList.remove('hidden');
-                btn.textContent = "Login Dashboard"; btn.disabled = false;
+            const btn = document.getElementById('btn-login'); btn.disabled = true; btn.textContent = "Verifying...";
+            try { 
+                await signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value); 
+            } catch (error) { 
+                document.getElementById('login-error').classList.remove('hidden'); 
+                btn.disabled = false; btn.textContent = "Masuk Dashboard"; 
             }
         });
         document.getElementById('btn-logout').addEventListener('click', () => signOut(auth));
 
-        // MAIN DATA LISTENER
-        function listenToData() {
-            const today = new Date();
-            today.setHours(0,0,0,0);
+        // --- TABS ---
+        window.switchTab = function(tab) {
+            document.querySelectorAll('.tab-view').forEach(el => el.classList.add('hidden'));
+            document.getElementById('view-'+tab).classList.remove('hidden');
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-'+tab).classList.add('active');
+        }
+
+        function initDashboard() {
+            const today = new Date(); today.setHours(0,0,0,0);
+            document.getElementById('header-date').textContent = today.toLocaleDateString('id-ID', {weekday: 'long', day:'numeric', month:'long', year:'numeric'});
             
-            // Set Header Date
-            document.getElementById('header-date').textContent = today.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-
+            // Listen Orders
             const q = query(collection(db, "orders"), orderBy("createdAt", "desc"));
-
             onSnapshot(q, (snapshot) => {
                 allOrdersToday = [];
+                systemQrisTotalFullDay = 0;
                 let itemCounts = {};
+                let hourlySales = new Array(24).fill(0);
 
                 snapshot.forEach((doc) => {
                     const data = doc.data();
                     if (!data.createdAt) return;
-                    
                     const orderDate = data.createdAt.toDate();
                     
-                    // Filter Hari Ini
                     if (orderDate.setHours(0,0,0,0) === today.getTime()) {
+                        // Data dasar
                         const formattedTime = doc.data().createdAt.toDate().toLocaleTimeString('id-ID', {hour12: false, hour: '2-digit', minute:'2-digit'});
-                        
-                        allOrdersToday.push({
-                            ...data,
-                            formattedTime: formattedTime,
-                            rawDate: doc.data().createdAt.toDate()
-                        });
+                        allOrdersToday.push({ ...data, formattedTime: formattedTime, rawDate: doc.data().createdAt.toDate() });
 
-                        // Hitung Item untuk Best Seller
+                        // Hitung QRIS Total
+                        if((data.paymentMethod||'').toLowerCase().includes('qris')) systemQrisTotalFullDay += (data.total || 0);
+
+                        // Hitung Grafik Jam
+                        const hour = doc.data().createdAt.toDate().getHours();
+                        hourlySales[hour] += (data.total || 0);
+
+                        // Hitung Top Items
                         if (data.items && Array.isArray(data.items)) {
                             data.items.forEach(item => {
-                                // Bersihkan nama item (hapus varian jika mau, disini kita gabung)
-                                const itemName = item.name + (item.variant ? ` (${item.variant})` : '');
-                                itemCounts[itemName] = (itemCounts[itemName] || 0) + (item.qty || 1);
+                                const name = item.name + (item.variant ? ` (${item.variant})` : '');
+                                itemCounts[name] = (itemCounts[name] || 0) + (item.qty || 1);
                             });
                         }
                     }
                 });
 
                 updateShiftCards();
-                updateCharts();
+                updateBankPanel();
+                updateCharts(hourlySales);
                 updateTopItems(itemCounts);
-                applyFilter(); // Update table & calculator
-
+                applyFilter(); // Refresh table & calculator
             }, (error) => {
-                console.error("Firebase Error:", error);
+                console.error("Orders Error:", error);
+                if(error.code === 'permission-denied') alert("Gagal akses data penjualan. Cek Rules.");
             });
-        }
 
-        // 1. UPDATE SHIFT CARDS
-        function updateShiftCards() {
-            let s1 = { total: 0, cash: 0, qris: 0 }, s2 = { total: 0, cash: 0, qris: 0 }, s3 = { total: 0, cash: 0, qris: 0 };
-
-            allOrdersToday.forEach(o => {
-                const t = o.formattedTime;
-                const amt = o.total || 0;
-                const isQris = (o.paymentMethod || '').toLowerCase().includes('qris');
-                
-                if (t >= '08:00' && t <= '16:00') { // Shift 1
-                    s1.total += amt; isQris ? s1.qris += amt : s1.cash += amt;
-                } else if (t > '16:00' && t <= '23:59') { // Shift 2
-                    s2.total += amt; isQris ? s2.qris += amt : s2.cash += amt;
-                } else if (t >= '00:00' && t < '08:00') { // Shift 3
-                    s3.total += amt; isQris ? s3.qris += amt : s3.cash += amt;
+            // Listen Bank Expenses (With Permission Handling)
+            const qExp = query(collection(db, "bank_expenses"), orderBy("timestamp", "desc"));
+            onSnapshot(qExp, (snapshot) => {
+                const list = document.getElementById('bank-expense-list');
+                list.innerHTML = '';
+                let hasData = false;
+                snapshot.forEach(doc => {
+                    const d = doc.data();
+                    if(!d.timestamp) return;
+                    if(d.timestamp.toDate().setHours(0,0,0,0) === today.getTime()) {
+                        hasData = true;
+                        list.innerHTML += `<div class="flex justify-between text-xs bg-red-50 p-2 rounded border border-red-100 mb-1 items-center"><div><span class="font-bold text-slate-700 block">${d.desc}</span><span class="text-[10px] text-slate-400">${d.timestamp.toDate().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})}</span></div><span class="font-bold text-red-500">- Rp ${d.amount.toLocaleString('id-ID')}</span></div>`;
+                    }
+                });
+                if(!hasData) list.innerHTML = '<p class="text-xs text-gray-400 text-center italic mt-4">Belum ada pengeluaran hari ini.</p>';
+            }, (error) => {
+                console.warn("Bank Expense Error:", error);
+                const list = document.getElementById('bank-expense-list');
+                if(error.code === 'permission-denied') {
+                    list.innerHTML = '<div class="text-xs text-red-500 p-3 bg-red-50 rounded border border-red-200 text-center">⚠️ <b>Akses Ditolak</b><br>Fitur ini butuh update Rules Database.</div>';
                 }
             });
-
-            const fmt = (n) => `Rp ${n.toLocaleString('id-ID')}`;
-            document.getElementById('s1-total').textContent = fmt(s1.total); document.getElementById('s1-cash').textContent = fmt(s1.cash); document.getElementById('s1-qris').textContent = fmt(s1.qris);
-            document.getElementById('s2-total').textContent = fmt(s2.total); document.getElementById('s2-cash').textContent = fmt(s2.cash); document.getElementById('s2-qris').textContent = fmt(s2.qris);
-            document.getElementById('s3-total').textContent = fmt(s3.total); document.getElementById('s3-cash').textContent = fmt(s3.cash); document.getElementById('s3-qris').textContent = fmt(s3.qris);
         }
 
-        // 2. UPDATE CHARTS (HOURLY TREND)
-        function updateCharts() {
-            const ctx = document.getElementById('hourlyChart').getContext('2d');
-            
-            // Siapkan 24 jam data
-            let hourlySales = new Array(24).fill(0);
+        // --- LOGIC BLOCKS ---
+
+        function updateShiftCards() {
+            let s1={t:0,c:0,q:0}, s2={t:0,c:0,q:0}, s3={t:0,c:0,q:0};
             allOrdersToday.forEach(o => {
-                const hour = o.rawDate.getHours();
-                hourlySales[hour] += (o.total || 0);
+                const t = o.formattedTime; const amt = o.total||0; const isQris = (o.paymentMethod||'').toLowerCase().includes('qris');
+                
+                // LOGIKA SHIFT 1 (08:00 - 16:00)
+                if(t>='08:00' && t<='16:00') { s1.t+=amt; isQris?s1.q+=amt:s1.c+=amt; }
+                // LOGIKA SHIFT 2 (16:00 - 00:00)
+                else if(t>'16:00' && t<='23:59') { s2.t+=amt; isQris?s2.q+=amt:s2.c+=amt; }
+                // LOGIKA SHIFT 3 (00:00 - 08:00)
+                else if(t>='00:00' && t<'08:00') { s3.t+=amt; isQris?s3.q+=amt:s3.c+=amt; }
             });
+            
+            const fmt = n => `Rp ${n.toLocaleString('id-ID')}`;
+            // Update UI
+            document.getElementById('s1-total').innerText = fmt(s1.t); document.getElementById('s1-cash').innerText = s1.c.toLocaleString(); document.getElementById('s1-qris').innerText = s1.q.toLocaleString();
+            document.getElementById('s2-total').innerText = fmt(s2.t); document.getElementById('s2-cash').innerText = s2.c.toLocaleString(); document.getElementById('s2-qris').innerText = s2.q.toLocaleString();
+            document.getElementById('s3-total').innerText = fmt(s3.t); document.getElementById('s3-cash').innerText = s3.c.toLocaleString(); document.getElementById('s3-qris').innerText = s3.q.toLocaleString();
+        }
 
-            // Labels jam 00 - 23
-            const labels = Array.from({length: 24}, (_, i) => `${i}:00`);
+        function updateBankPanel() {
+            const elSystem = document.getElementById('bank-qris-system');
+            const elNet = document.getElementById('est-net-receive');
+            if(elSystem) elSystem.innerText = `Rp ${systemQrisTotalFullDay.toLocaleString('id-ID')}`;
+            if(elNet) elNet.innerText = `Rp ${Math.round(systemQrisTotalFullDay * 0.993).toLocaleString('id-ID')}`;
+        }
 
-            if (chartInstance) chartInstance.destroy();
+        function updateCharts(data) {
+            const ctx = document.getElementById('hourlyChart').getContext('2d');
+            if(chartInstance) chartInstance.destroy();
+            
+            // Warna gradient untuk chart
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            gradient.addColorStop(0, 'rgba(59, 130, 246, 0.5)');
+            gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
 
             chartInstance = new Chart(ctx, {
-                type: 'line',
+                type: 'bar',
                 data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Penjualan (Rp)',
-                        data: hourlySales,
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 2
-                    }]
+                    labels: Array.from({length:24}, (_,i)=>`${String(i).padStart(2,'0')}:00`),
+                    datasets: [{ label: 'Penjualan (Rp)', data: data, backgroundColor: '#3b82f6', borderRadius: 4, hoverBackgroundColor: '#2563eb' }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { beginAtZero: true, grid: { borderDash: [2, 2] } },
-                        x: { grid: { display: false } }
-                    }
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { legend: {display:false} }, 
+                    scales: { 
+                        x: { grid:{display:false}, ticks:{font:{size:10}} },
+                        y: { grid:{borderDash:[4,4]}, ticks:{callback: function(value){return value/1000 + 'k'}} }
+                    } 
                 }
             });
         }
 
-        // 3. UPDATE TOP ITEMS
-        function updateTopItems(itemCounts) {
-            // Sort Descending
-            const sorted = Object.entries(itemCounts).sort((a, b) => b[1] - a[1]).slice(0, 10);
-            const container = document.getElementById('top-items-list');
-            
-            if (sorted.length === 0) {
-                container.innerHTML = '<p class="text-center text-slate-400 text-sm mt-10">Belum ada data.</p>';
-                return;
-            }
-
-            container.innerHTML = sorted.map(([name, count], index) => {
-                const color = index === 0 ? 'text-yellow-500' : (index === 1 ? 'text-slate-400' : (index === 2 ? 'text-orange-700' : 'text-slate-600'));
-                const icon = index < 3 ? '<i class="fas fa-trophy"></i>' : '<i class="fas fa-circle text-[6px]"></i>';
-                
-                return `
-                    <div class="flex items-center justify-between p-2 hover:bg-slate-50 rounded border-b border-slate-50 last:border-0">
-                        <div class="flex items-center gap-3">
-                            <span class="${color} w-6 text-center text-sm">${icon}</span>
-                            <span class="text-sm font-medium text-slate-700 truncate max-w-[150px]">${name}</span>
-                        </div>
-                        <span class="text-xs font-bold bg-blue-50 text-blue-600 px-2 py-1 rounded-full">${count} terjual</span>
+        function updateTopItems(counts) {
+            const sorted = Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,10);
+            const el = document.getElementById('top-items-list');
+            if(sorted.length===0) { el.innerHTML='<p class="text-center text-sm text-slate-400 mt-10">Belum ada data penjualan.</p>'; return; }
+            el.innerHTML = sorted.map(([name, count], i) => `
+                <div class="flex justify-between items-center p-2 hover:bg-slate-50 rounded border-b border-slate-50 last:border-0 transition">
+                    <div class="flex items-center gap-3">
+                        <span class="font-bold ${i<3 ? 'text-yellow-500' : 'text-slate-300'} w-5 text-center">${i+1}</span>
+                        <span class="text-sm font-medium text-slate-700 truncate max-w-[200px]">${name}</span>
                     </div>
-                `;
-            }).join('');
+                    <span class="text-[10px] font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded-full">${count}x</span>
+                </div>
+            `).join('');
         }
 
-        // 4. FILTER & CALCULATOR LOGIC [FIXED VISUAL]
-        window.setShift = function(start, end, btnElement) {
+        // Calculator & Filter
+        window.setShift = function(start, end, btn) {
             document.getElementById('filter-start-time').value = start;
             document.getElementById('filter-end-time').value = end;
             
-            // Reset visual semua tombol
+            // Visual Logic Fix: Use classList directly based on 'this'
             document.querySelectorAll('.shift-btn').forEach(b => {
-                b.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
-                b.classList.add('text-slate-600', 'bg-white');
+                b.classList.remove('bg-blue-600','text-white','shadow-md','border-blue-600'); 
+                b.classList.add('bg-white','text-slate-600','border-slate-200');
             });
-
-            // Set aktif tombol yang diklik
-            if (btnElement) {
-                btnElement.classList.remove('text-slate-600', 'bg-white');
-                btnElement.classList.add('bg-blue-600', 'text-white', 'shadow-md');
+            
+            if(btn) { 
+                btn.classList.remove('bg-white','text-slate-600','border-slate-200'); 
+                btn.classList.add('bg-blue-600','text-white','shadow-md','border-blue-600'); 
             }
             
             applyFilter();
@@ -467,125 +502,84 @@
         window.applyFilter = function() {
             const start = document.getElementById('filter-start-time').value;
             const end = document.getElementById('filter-end-time').value;
-
             const filtered = allOrdersToday.filter(o => o.formattedTime >= start && o.formattedTime <= end);
-            renderTable(filtered);
-        }
-
-        function renderTable(orders) {
-            let cash = 0, qris = 0;
-            const tbody = document.getElementById('transaction-list');
-            tbody.innerHTML = '';
-
-            if (orders.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="p-6 text-center text-slate-400 italic">Tidak ada transaksi pada jam ini.</td></tr>';
-                updateSystemData(0, 0);
-                return;
-            }
-
-            orders.forEach(o => {
-                const amt = o.total || 0;
-                const method = (o.paymentMethod || 'cash').toLowerCase();
-                const isQris = method.includes('qris');
+            
+            let cash = 0;
+            const tbody = document.getElementById('transaction-list'); tbody.innerHTML = '';
+            
+            filtered.forEach(o => {
+                const isQris = (o.paymentMethod||'').toLowerCase().includes('qris');
+                if(!isQris) cash += (o.total||0);
                 
-                if (isQris) qris += amt; else cash += amt;
-
-                // Format Items String
-                let itemsStr = "-";
-                if(o.items && o.items.length > 0) {
-                    itemsStr = o.items.map(i => `${i.qty}x ${i.name}`).join(', ');
-                }
-
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50 transition border-b border-slate-100">
-                        <td class="p-4 font-mono text-xs text-slate-500">${o.formattedTime}</td>
-                        <td class="p-4 font-bold text-slate-700">${o.customer || 'Guest'}</td>
-                        <td class="p-4 text-xs text-slate-500 truncate max-w-[150px]" title="${itemsStr}">${itemsStr}</td>
-                        <td class="p-4"><span class="px-2 py-1 rounded text-[10px] font-bold uppercase ${isQris ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">${o.paymentMethod}</span></td>
-                        <td class="p-4 text-right font-bold text-slate-700">Rp ${amt.toLocaleString('id-ID')}</td>
-                    </tr>
-                `;
+                let itemsStr = (o.items||[]).map(i=>`${i.qty}x ${i.name}`).join(', ');
+                tbody.innerHTML += `<tr class="hover:bg-slate-50 border-b border-slate-100 transition"><td class="p-4 text-xs text-slate-500 whitespace-nowrap font-mono">${o.formattedTime}</td><td class="p-4 font-bold text-slate-700 whitespace-nowrap">${o.customer}</td><td class="p-4 text-xs text-slate-500 truncate max-w-[150px]" title="${itemsStr}">${itemsStr}</td><td class="p-4 whitespace-nowrap"><span class="px-2 py-1 rounded text-[10px] font-bold uppercase ${isQris?'bg-green-100 text-green-700':'bg-yellow-100 text-yellow-700'}">${o.paymentMethod}</span></td><td class="p-4 text-right font-bold text-slate-700 whitespace-nowrap">Rp ${(o.total||0).toLocaleString('id-ID')}</td></tr>`;
             });
-
-            updateSystemData(cash, qris);
-        }
-
-        function updateSystemData(cash, qris) {
+            
+            if(filtered.length===0) tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center italic text-slate-400">Tidak ada data transaksi pada rentang waktu ini.</td></tr>';
+            
             systemCashTotal = cash;
-            document.getElementById('system-cash-display').textContent = `Rp ${cash.toLocaleString('id-ID')}`;
-            document.getElementById('system-qris-display').textContent = `Rp ${qris.toLocaleString('id-ID')}`;
+            const elSys = document.getElementById('system-cash-display');
+            if(elSys) elSys.innerText = `Rp ${cash.toLocaleString('id-ID')}`;
             calculateClosing();
         }
 
         window.calculateClosing = function() {
-            const modal = parseFloat(document.getElementById('input-modal-awal').value) || 0;
-            const laci = parseFloat(document.getElementById('input-fisik-akhir').value) || 0;
-            const bon = parseFloat(document.getElementById('input-pengeluaran').value) || 0;
-
+            const modal = parseFloat(document.getElementById('input-modal-awal').value)||0;
+            const laci = parseFloat(document.getElementById('input-fisik-akhir').value)||0;
+            const bon = parseFloat(document.getElementById('input-pengeluaran').value)||0;
+            
             const fisikBersih = (laci - modal) + bon;
             const selisih = fisikBersih - systemCashTotal;
-
-            document.getElementById('calculated-physical-revenue').textContent = `Rp ${fisikBersih.toLocaleString('id-ID')}`;
             
-            const box = document.getElementById('result-box');
-            const amt = document.getElementById('variance-amount');
-            const sts = document.getElementById('variance-status');
+            const elPhys = document.getElementById('calculated-physical-revenue');
+            if(elPhys) elPhys.innerText = `Rp ${fisikBersih.toLocaleString('id-ID')}`;
+            
+            const elAmt = document.getElementById('variance-amount');
+            const elSts = document.getElementById('variance-status');
+            
+            if(!elAmt || !elSts) return;
 
-            amt.textContent = `Rp ${selisih.toLocaleString('id-ID')}`;
-
-            // Reset classes
-            box.className = "p-6 rounded-2xl border-2 transition-all duration-300";
-
-            if (document.getElementById('input-fisik-akhir').value === '') {
-                box.classList.add('bg-slate-100', 'border-slate-200');
-                amt.className = "text-3xl font-black text-slate-400 mb-2";
-                sts.textContent = "Menunggu Input";
-                sts.className = "inline-block px-3 py-1 rounded-full text-xs font-bold bg-slate-200 text-slate-500";
+            elAmt.innerText = `Rp ${selisih.toLocaleString('id-ID')}`;
+            
+            if(document.getElementById('input-fisik-akhir').value === '') {
+                elAmt.className = "block font-black text-xl text-slate-400"; elSts.innerText = "Menunggu Input"; elSts.className = "text-[10px] bg-slate-200 px-2 py-0.5 rounded text-slate-500 font-bold";
             } else if (selisih === 0) {
-                box.classList.add('bg-green-50', 'border-green-500');
-                amt.className = "text-3xl font-black text-green-600 mb-2";
-                sts.textContent = "✅ KLOP / AMAN";
-                sts.className = "inline-block px-3 py-1 rounded-full text-xs font-bold bg-green-200 text-green-800";
+                elAmt.className = "block font-black text-xl text-green-600"; elSts.innerText = "✅ KLOP (AMAN)"; elSts.className = "text-[10px] bg-green-100 px-2 py-0.5 rounded text-green-800 font-bold";
             } else if (selisih < 0) {
-                box.classList.add('bg-red-50', 'border-red-500');
-                amt.className = "text-3xl font-black text-red-600 mb-2";
-                sts.textContent = "⚠️ MINUS / HILANG";
-                sts.className = "inline-block px-3 py-1 rounded-full text-xs font-bold bg-red-200 text-red-800";
+                elAmt.className = "block font-black text-xl text-red-600"; elSts.innerText = "⚠️ MINUS (KURANG)"; elSts.className = "text-[10px] bg-red-100 px-2 py-0.5 rounded text-red-800 font-bold";
             } else {
-                box.classList.add('bg-blue-50', 'border-blue-500');
-                amt.className = "text-3xl font-black text-blue-600 mb-2";
-                sts.textContent = "ℹ️ SURPLUS / LEBIH";
-                sts.className = "inline-block px-3 py-1 rounded-full text-xs font-bold bg-blue-200 text-blue-800";
+                elAmt.className = "block font-black text-xl text-blue-600"; elSts.innerText = "ℹ️ SURPLUS (LEBIH)"; elSts.className = "text-[10px] bg-blue-100 px-2 py-0.5 rounded text-blue-800 font-bold";
             }
         }
-
-        window.resetCalculator = function() {
-            document.getElementById('input-modal-awal').value = '';
-            document.getElementById('input-fisik-akhir').value = '';
-            document.getElementById('input-pengeluaran').value = '';
-            calculateClosing();
+        window.resetCalculator = function() { document.getElementById('input-modal-awal').value=''; document.getElementById('input-fisik-akhir').value=''; document.getElementById('input-pengeluaran').value=''; calculateClosing(); }
+        
+        window.submitBankExpense = async function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-save-expense'); btn.disabled=true; btn.innerText="...";
+            try {
+                await addDoc(collection(db, "bank_expenses"), {
+                    desc: document.getElementById('expense-desc').value,
+                    amount: parseFloat(document.getElementById('expense-amount').value),
+                    timestamp: serverTimestamp(),
+                    user: auth.currentUser.email
+                });
+                document.getElementById('expense-desc').value=''; document.getElementById('expense-amount').value='';
+                alert("Pengeluaran berhasil dicatat!");
+            } catch(e) { alert("Gagal simpan: " + e.message); }
+            btn.disabled=false; btn.innerText="Simpan Catatan";
         }
 
-        // CSV Export Logic
         window.downloadCSV = function() {
-            if (allOrdersToday.length === 0) return alert("Belum ada data untuk diunduh.");
-            
-            let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "Jam,Pelanggan,Items,Metode,Total\n";
-
+            if (allOrdersToday.length === 0) return alert("Tidak ada data untuk diunduh.");
+            let csv = "Jam,Customer,Items,Metode,Total\n";
             allOrdersToday.forEach(o => {
-                let items = o.items ? o.items.map(i => `${i.qty}x ${i.name}`).join('; ') : "-";
-                let row = `${o.formattedTime},"${o.customer || 'Guest'}","${items}",${o.paymentMethod},${o.total}`;
-                csvContent += row + "\n";
+                let i = (o.items||[]).map(x=>`${x.qty} ${x.name}`).join('; ');
+                csv += `${o.formattedTime},"${o.customer || 'Guest'}","${i}",${o.paymentMethod},${o.total}\n`;
             });
-
-            const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `Laporan_Payboss_${new Date().toISOString().slice(0,10)}.csv`);
-            document.body.appendChild(link);
+            link.href = "data:text/csv;charset=utf-8," + encodeURI(csv);
+            link.download = `Laporan_Payboss_${new Date().toISOString().slice(0,10)}.csv`;
             link.click();
-            document.body.removeChild(link);
         }
     </script>
 </body>
