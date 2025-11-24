@@ -44,188 +44,207 @@
                 <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
                     <i class="fas fa-chart-pie text-blue-600"></i> Payboss Analytics
                 </h1>
-                <p class="text-slate-500 text-sm">Laporan & Analisis Bisnis</p>
+                <p class="text-slate-500 text-sm">Laporan Harian & Kontrol Keuangan</p>
             </div>
             <div class="flex items-center gap-3">
                 <div class="bg-white px-4 py-2 rounded-lg shadow border text-right">
-                    <p class="text-[10px] uppercase font-bold text-slate-400">Hari Ini</p>
-                    <p id="header-date" class="font-bold text-sm text-blue-600">...</p>
+                    <p class="text-[10px] uppercase font-bold text-slate-400">Tanggal Laporan</p>
+                    <p id="header-date" class="font-bold text-sm text-blue-600">Loading...</p>
                 </div>
                 <button id="btn-logout" class="p-2 text-red-600 hover:bg-red-50 rounded-lg border border-red-200"><i class="fas fa-sign-out-alt"></i></button>
             </div>
         </div>
 
         <!-- NAVIGATION TABS -->
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 mb-6 flex overflow-x-auto sticky top-0 z-10">
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 mb-6 flex overflow-x-auto">
             <div onclick="switchTab('ops')" id="tab-ops" class="nav-item active flex-1 py-4 text-center min-w-[150px]">
-                <i class="fas fa-cash-register mr-2"></i> Harian & Closing
+                <i class="fas fa-cash-register mr-2"></i> Closing & Bank
             </div>
             <div onclick="switchTab('analytics')" id="tab-analytics" class="nav-item flex-1 py-4 text-center min-w-[150px]">
                 <i class="fas fa-chart-line mr-2"></i> Analisis Toko
             </div>
             <div onclick="switchTab('data')" id="tab-data" class="nav-item flex-1 py-4 text-center min-w-[150px]">
-                <i class="fas fa-table mr-2"></i> Laporan Transaksi
+                <i class="fas fa-table mr-2"></i> Data Transaksi
             </div>
         </div>
 
-        <!-- === TAB 1: OPERASIONAL (REAL TIME TODAY) === -->
+        <!-- === TAB 1: OPERASIONAL === -->
         <div id="view-ops" class="tab-view fade-in">
             
-            <!-- Shift Summaries -->
+            <!-- Shift Cards -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <!-- S1 -->
-                <div class="glass-card p-5 border-l-4 border-yellow-400 relative overflow-hidden">
+                <!-- Shift 1 (Pagi) -->
+                <div class="glass-card p-5 border-l-4 border-yellow-400 relative overflow-hidden group">
                     <div class="flex justify-between items-start">
-                        <div><span class="text-xs font-bold text-slate-400 uppercase">Shift 1 (Pagi)</span><div class="text-2xl font-bold text-slate-800 mt-1" id="s1-total">Rp 0</div></div>
+                        <div>
+                            <span class="text-xs font-bold text-slate-400 uppercase">Shift 1 (Pagi)</span>
+                            <div class="text-2xl font-bold text-slate-800 mt-1" id="s1-total">Rp 0</div>
+                        </div>
                         <span class="bg-yellow-100 text-yellow-800 text-[10px] px-2 py-1 rounded font-bold">08:00 - 16:00</span>
                     </div>
-                    <div class="grid grid-cols-2 gap-2 mt-4 text-xs"><div class="bg-slate-50 p-2 rounded">Cash: <span id="s1-cash" class="font-bold">0</span></div><div class="bg-green-50 p-2 rounded">QRIS: <span id="s1-qris" class="font-bold text-green-700">0</span></div></div>
-                </div>
-                <!-- S2 -->
-                <div class="glass-card p-5 border-l-4 border-orange-400 relative overflow-hidden">
-                    <div class="flex justify-between items-start">
-                        <div><span class="text-xs font-bold text-slate-400 uppercase">Shift 2 (Sore)</span><div class="text-2xl font-bold text-slate-800 mt-1" id="s2-total">Rp 0</div></div>
-                        <span class="bg-orange-100 text-orange-800 text-[10px] px-2 py-1 rounded font-bold">16:00 - 00:00</span>
+                    <div class="grid grid-cols-2 gap-2 mt-4 text-xs border-t pt-2 border-slate-100">
+                        <div class="bg-slate-50 p-1.5 rounded">Cash: <span id="s1-cash" class="font-bold text-slate-700">0</span></div>
+                        <div class="bg-green-50 p-1.5 rounded">QRIS: <span id="s1-qris" class="font-bold text-green-700">0</span></div>
                     </div>
-                    <div class="grid grid-cols-2 gap-2 mt-4 text-xs"><div class="bg-slate-50 p-2 rounded">Cash: <span id="s2-cash" class="font-bold">0</span></div><div class="bg-green-50 p-2 rounded">QRIS: <span id="s2-qris" class="font-bold text-green-700">0</span></div></div>
                 </div>
-                <!-- S3 -->
-                <div class="glass-card p-5 border-l-4 border-blue-500 relative overflow-hidden">
+                <!-- Shift 2 (Sore) -->
+                <div class="glass-card p-5 border-l-4 border-orange-400 relative overflow-hidden group">
                     <div class="flex justify-between items-start">
-                        <div><span class="text-xs font-bold text-slate-400 uppercase">Shift 3 (Malam)</span><div class="text-2xl font-bold text-slate-800 mt-1" id="s3-total">Rp 0</div></div>
-                        <span class="bg-blue-100 text-blue-800 text-[10px] px-2 py-1 rounded font-bold">00:00 - 08:00</span>
+                        <div>
+                            <span class="text-xs font-bold text-slate-400 uppercase">Shift 2 (Sore)</span>
+                            <div class="text-2xl font-bold text-slate-800 mt-1" id="s2-total">Rp 0</div>
+                        </div>
+                        <span class="bg-orange-100 text-orange-800 text-[10px] px-2 py-1 rounded font-bold">16:00 - 23:00</span>
                     </div>
-                    <div class="grid grid-cols-2 gap-2 mt-4 text-xs"><div class="bg-slate-50 p-2 rounded">Cash: <span id="s3-cash" class="font-bold">0</span></div><div class="bg-green-50 p-2 rounded">QRIS: <span id="s3-qris" class="font-bold text-green-700">0</span></div></div>
+                    <div class="grid grid-cols-2 gap-2 mt-4 text-xs border-t pt-2 border-slate-100">
+                        <div class="bg-slate-50 p-1.5 rounded">Cash: <span id="s2-cash" class="font-bold text-slate-700">0</span></div>
+                        <div class="bg-green-50 p-1.5 rounded">QRIS: <span id="s2-qris" class="font-bold text-green-700">0</span></div>
+                    </div>
+                </div>
+                <!-- Shift 3 (Malam) -->
+                <div class="glass-card p-5 border-l-4 border-blue-500 relative overflow-hidden group">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-xs font-bold text-slate-400 uppercase">Shift 3 (Malam)</span>
+                            <div class="text-2xl font-bold text-slate-800 mt-1" id="s3-total">Rp 0</div>
+                        </div>
+                        <span class="bg-blue-100 text-blue-800 text-[10px] px-2 py-1 rounded font-bold">23:00 - 08:00</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 mt-4 text-xs border-t pt-2 border-slate-100">
+                        <div class="bg-slate-50 p-1.5 rounded">Cash: <span id="s3-cash" class="font-bold text-slate-700">0</span></div>
+                        <div class="bg-green-50 p-1.5 rounded">QRIS: <span id="s3-qris" class="font-bold text-green-700">0</span></div>
+                    </div>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Closing Calculator -->
+                <!-- Calculator -->
                 <div class="glass-card p-6">
-                    <div class="flex justify-between items-center mb-4 pb-2 border-b"><h3 class="font-bold text-slate-700"><i class="fas fa-calculator text-blue-500"></i> Closing Kasir (Hari Ini)</h3><button onclick="resetCalculator()" class="text-xs bg-slate-200 px-3 py-1 rounded hover:bg-slate-300">Reset</button></div>
-                    <div class="flex gap-2 mb-4 overflow-x-auto pb-2">
-                        <button onclick="setShift('08:00', '16:00', this)" class="shift-btn flex-1 py-2 px-3 rounded text-xs font-bold border text-slate-600">S1</button>
-                        <button onclick="setShift('16:00', '23:59', this)" class="shift-btn flex-1 py-2 px-3 rounded text-xs font-bold border text-slate-600">S2</button>
-                        <button onclick="setShift('00:00', '08:00', this)" class="shift-btn flex-1 py-2 px-3 rounded text-xs font-bold border text-slate-600">S3</button>
-                        <button onclick="setShift('00:00', '23:59', this)" class="shift-btn flex-1 py-2 px-3 rounded text-xs font-bold bg-blue-600 text-white shadow-md">ALL</button>
+                    <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
+                        <h3 class="font-bold text-slate-700 flex items-center gap-2"><i class="fas fa-calculator text-blue-500"></i> Closing Kasir</h3>
+                        <button onclick="resetCalculator()" class="text-xs bg-slate-200 hover:bg-slate-300 px-3 py-1 rounded transition">Reset Form</button>
                     </div>
-                    <div class="space-y-3">
+                    
+                    <!-- Tombol Shift (Diperbarui Onclick-nya) -->
+                    <div class="flex gap-2 mb-4 overflow-x-auto pb-2">
+                        <button onclick="setShift('s1', this)" class="shift-btn flex-1 py-2 px-3 rounded text-xs font-bold border transition text-slate-600 hover:bg-blue-50">S1 (08-16)</button>
+                        <button onclick="setShift('s2', this)" class="shift-btn flex-1 py-2 px-3 rounded text-xs font-bold border transition text-slate-600 hover:bg-blue-50">S2 (16-23)</button>
+                        <button onclick="setShift('s3', this)" class="shift-btn flex-1 py-2 px-3 rounded text-xs font-bold border transition text-slate-600 hover:bg-blue-50">S3 (23-08)</button>
+                        <button onclick="setShift('all', this)" class="shift-btn flex-1 py-2 px-3 rounded text-xs font-bold bg-blue-600 text-white shadow-md border-blue-600">ALL</button>
+                    </div>
+
+                    <div class="space-y-4">
+                        <!-- Inputs -->
                         <div class="grid grid-cols-2 gap-4">
-                            <div><label class="text-[10px] font-bold text-slate-400 uppercase">Modal Awal</label><input type="number" id="input-modal-awal" oninput="calculateClosing()" class="w-full p-2 border rounded text-right font-mono text-sm" placeholder="0"></div>
-                            <div><label class="text-[10px] font-bold text-slate-400 uppercase">Bon / Keluar</label><input type="number" id="input-pengeluaran" oninput="calculateClosing()" class="w-full p-2 border rounded text-right font-mono text-sm text-orange-600" placeholder="0"></div>
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Modal Awal</label>
+                                <input type="number" id="input-modal-awal" oninput="calculateClosing()" class="w-full p-2 border rounded text-right font-mono text-sm outline-none focus:border-blue-500" placeholder="0">
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Bon / Pengeluaran</label>
+                                <input type="number" id="input-pengeluaran" oninput="calculateClosing()" class="w-full p-2 border rounded text-right font-mono text-sm text-orange-600 outline-none focus:border-orange-500" placeholder="0">
+                            </div>
                         </div>
-                        <div><label class="text-[10px] font-bold text-slate-400 uppercase">Total Fisik (Laci)</label><input type="number" id="input-fisik-akhir" oninput="calculateClosing()" class="w-full p-3 border-2 border-blue-200 rounded text-right font-bold text-lg" placeholder="0"></div>
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Total Uang Fisik (Hitungan Akhir)</label>
+                            <input type="number" id="input-fisik-akhir" oninput="calculateClosing()" class="w-full p-3 border-2 border-blue-200 rounded text-right font-bold text-lg outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" placeholder="0">
+                        </div>
+                        
+                        <!-- Hasil Rekonsiliasi -->
                         <div class="bg-slate-50 p-4 rounded-xl border mt-2">
-                            <div class="flex justify-between text-xs mb-1"><span class="text-slate-500">Target Sistem (Cash):</span><span id="system-cash-display" class="font-bold">Rp 0</span></div>
-                            <div class="flex justify-between text-xs mb-1 border-b border-slate-200 pb-2"><span class="text-slate-500">Target Fisik (Hitung):</span><span id="calculated-physical-revenue" class="font-bold text-blue-600">Rp 0</span></div>
-                            <div class="flex justify-between items-center pt-2"><span class="font-bold text-slate-700 text-sm">Selisih:</span><div class="text-right"><span id="variance-amount" class="block font-black text-xl text-slate-400">Rp 0</span><span id="variance-status" class="text-[10px] bg-slate-200 px-2 py-0.5 rounded text-slate-500">...</span></div></div>
+                            <div class="flex justify-between text-xs mb-2">
+                                <span class="text-slate-500">Target Sistem (Cash):</span>
+                                <span id="system-cash-display" class="font-bold text-slate-700">Rp 0</span>
+                            </div>
+                            <div class="flex justify-between text-xs mb-2 border-b border-slate-200 pb-2">
+                                <span class="text-slate-500">Target Fisik (Laci - Modal + Bon):</span>
+                                <span id="calculated-physical-revenue" class="font-bold text-blue-600">Rp 0</span>
+                            </div>
+                            <div class="flex justify-between items-center pt-2">
+                                <span class="font-bold text-slate-700 text-sm">Selisih (Variance):</span>
+                                <div class="text-right">
+                                    <span id="variance-amount" class="block font-black text-xl text-slate-400">Rp 0</span>
+                                    <span id="variance-status" class="text-[10px] bg-slate-200 px-2 py-0.5 rounded text-slate-500 font-bold">Menunggu Input</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Bank Control -->
                 <div class="glass-card p-6">
-                    <h3 class="font-bold text-slate-700 mb-4 border-b pb-2"><i class="fas fa-university text-green-600"></i> Kontrol Bank & QRIS</h3>
+                    <h3 class="font-bold text-slate-700 mb-4 border-b pb-2 flex items-center gap-2">
+                        <i class="fas fa-university text-green-600"></i> Kontrol Bank & QRIS
+                    </h3>
                     <div class="bg-green-50 p-4 rounded-xl border border-green-100 mb-6">
-                        <div class="flex justify-between items-center mb-2"><span class="text-xs font-bold text-green-800 uppercase">Total QRIS Hari Ini</span><i class="fas fa-qrcode text-green-600 opacity-50"></i></div>
-                        <div class="flex justify-between items-end"><span id="bank-qris-system" class="text-2xl font-black text-green-700">Rp 0</span><div class="text-right"><p class="text-[10px] text-green-600">Est. Bersih (MDR 0.7%)</p><p id="est-net-receive" class="font-bold text-green-800">Rp 0</p></div></div>
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs font-bold text-green-800 uppercase">Total QRIS Hari Ini</span>
+                            <i class="fas fa-qrcode text-green-600 opacity-50"></i>
+                        </div>
+                        <div class="flex justify-between items-end">
+                            <span id="bank-qris-system" class="text-2xl font-black text-green-700">Rp 0</span>
+                            <div class="text-right">
+                                <p class="text-[10px] text-green-600">Est. Bersih (MDR 0.7%)</p>
+                                <p id="est-net-receive" class="font-bold text-green-800">Rp 0</p>
+                            </div>
+                        </div>
                     </div>
-                    <form onsubmit="submitBankExpense(event)" class="space-y-2">
+                    <form onsubmit="submitBankExpense(event)" class="space-y-3 bg-white p-1 rounded">
                         <p class="text-xs font-bold text-slate-400 uppercase">Catat Pengeluaran Transfer</p>
-                        <div class="flex gap-2"><input type="text" id="expense-desc" required placeholder="Ket (Beli Bahan)" class="flex-1 p-2 border rounded text-sm"><input type="number" id="expense-amount" required placeholder="Rp" class="w-24 p-2 border rounded text-sm"></div>
-                        <button type="submit" id="btn-save-expense" class="w-full bg-slate-800 text-white py-2 rounded text-xs font-bold hover:bg-slate-700">Simpan Catatan</button>
+                        <div class="flex gap-2">
+                            <input type="text" id="expense-desc" required placeholder="Ket (Misal: Beli Gula)" class="flex-1 p-2 border rounded text-sm outline-none focus:border-blue-500">
+                            <input type="number" id="expense-amount" required placeholder="Rp" class="w-24 p-2 border rounded text-sm outline-none focus:border-blue-500">
+                        </div>
+                        <button type="submit" id="btn-save-expense" class="w-full bg-slate-800 text-white py-2 rounded text-xs font-bold hover:bg-slate-700 transition">Simpan Catatan</button>
                     </form>
                     <div class="mt-4 max-h-32 overflow-y-auto space-y-1" id="bank-expense-list"></div>
                 </div>
             </div>
         </div>
 
-        <!-- === TAB 2: ANALISIS (FILTER DATE RANGE) === -->
+        <!-- === TAB 2: ANALISIS === -->
         <div id="view-analytics" class="tab-view hidden fade-in">
             <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6 flex flex-wrap items-center gap-4">
-                <div class="flex items-center gap-2">
-                    <span class="text-xs font-bold text-slate-500">Dari:</span>
-                    <input type="date" id="ana-start-date" class="p-2 border rounded text-sm">
-                </div>
-                <div class="flex items-center gap-2">
-                    <span class="text-xs font-bold text-slate-500">Sampai:</span>
-                    <input type="date" id="ana-end-date" class="p-2 border rounded text-sm">
-                </div>
-                <button onclick="loadHistoricalData()" class="bg-blue-600 text-white px-4 py-2 rounded text-sm font-bold hover:bg-blue-700 shadow">
-                    <i class="fas fa-search mr-1"></i> Tampilkan Data
-                </button>
+                <div class="flex items-center gap-2"><span class="text-xs font-bold text-slate-500">Dari:</span><input type="date" id="ana-start-date" class="p-2 border rounded text-sm"></div>
+                <div class="flex items-center gap-2"><span class="text-xs font-bold text-slate-500">Sampai:</span><input type="date" id="ana-end-date" class="p-2 border rounded text-sm"></div>
+                <button onclick="loadHistoricalData()" class="bg-blue-600 text-white px-4 py-2 rounded text-sm font-bold hover:bg-blue-700 shadow"><i class="fas fa-search mr-1"></i> Tampilkan Data</button>
             </div>
-
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Grafik -->
                 <div class="glass-card p-6 lg:col-span-2">
-                    <h3 class="font-bold text-slate-700 mb-4 flex items-center gap-2"><i class="fas fa-clock text-blue-500"></i> Distribusi Jam Ramai (Akumulasi)</h3>
+                    <h3 class="font-bold text-slate-700 mb-4 flex items-center gap-2"><i class="fas fa-clock text-blue-500"></i> Distribusi Jam Ramai</h3>
                     <div class="h-80 w-full"><canvas id="hourlyChart"></canvas></div>
-                    <p class="text-xs text-slate-400 mt-2 text-center">*Grafik menunjukkan total penjualan per jam dalam periode terpilih.</p>
                 </div>
-                <!-- Top Menu -->
                 <div class="glass-card p-6">
-                    <h3 class="font-bold text-slate-700 mb-4 flex items-center gap-2"><i class="fas fa-crown text-yellow-500"></i> Menu Terlaris (Periode Ini)</h3>
-                    <div class="space-y-2 overflow-y-auto h-80 pr-2" id="top-items-list">
-                        <p class="text-center text-slate-400 text-sm mt-10">Pilih tanggal & klik Tampilkan.</p>
-                    </div>
+                    <h3 class="font-bold text-slate-700 mb-4 flex items-center gap-2"><i class="fas fa-crown text-yellow-500"></i> Menu Terlaris</h3>
+                    <div class="space-y-2 overflow-y-auto h-80 pr-2" id="top-items-list"><p class="text-center text-slate-400 text-sm mt-10">Pilih tanggal & klik Tampilkan.</p></div>
                 </div>
             </div>
         </div>
 
-        <!-- === TAB 3: DATA TRANSAKSI (FILTER DATE RANGE) === -->
+        <!-- === TAB 3: DATA === -->
         <div id="view-data" class="tab-view hidden fade-in">
             <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6 flex flex-wrap items-center gap-4 justify-between">
                 <div class="flex gap-4">
-                    <div class="flex items-center gap-2">
-                        <span class="text-xs font-bold text-slate-500">Dari:</span>
-                        <input type="date" id="rep-start-date" class="p-2 border rounded text-sm">
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-xs font-bold text-slate-500">Sampai:</span>
-                        <input type="date" id="rep-end-date" class="p-2 border rounded text-sm">
-                    </div>
-                    <button onclick="loadReportData()" class="bg-blue-600 text-white px-4 py-2 rounded text-sm font-bold hover:bg-blue-700 shadow">
-                        <i class="fas fa-search mr-1"></i> Cari
-                    </button>
+                    <div class="flex items-center gap-2"><span class="text-xs font-bold text-slate-500">Dari:</span><input type="date" id="rep-start-date" class="p-2 border rounded text-sm"></div>
+                    <div class="flex items-center gap-2"><span class="text-xs font-bold text-slate-500">Sampai:</span><input type="date" id="rep-end-date" class="p-2 border rounded text-sm"></div>
+                    <button onclick="loadReportData()" class="bg-blue-600 text-white px-4 py-2 rounded text-sm font-bold hover:bg-blue-700 shadow"><i class="fas fa-search mr-1"></i> Cari</button>
                 </div>
-                <button onclick="downloadReportCSV()" class="text-xs bg-green-600 text-white px-3 py-2 rounded font-bold hover:bg-green-700 flex items-center gap-2 shadow">
-                    <i class="fas fa-file-excel"></i> Export CSV
-                </button>
+                <button onclick="downloadReportCSV()" class="text-xs bg-green-600 text-white px-3 py-2 rounded font-bold hover:bg-green-700 flex items-center gap-2 shadow"><i class="fas fa-file-excel"></i> Export CSV</button>
             </div>
-
             <div class="glass-card overflow-hidden">
-                <div class="p-4 bg-slate-50 border-b border-slate-200">
-                    <h3 class="font-bold text-slate-700" id="report-title">Hasil Pencarian</h3>
-                </div>
+                <div class="p-4 bg-slate-50 border-b border-slate-200"><h3 class="font-bold text-slate-700" id="report-title">Hasil Pencarian</h3></div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-sm">
-                        <thead class="bg-white text-slate-500 text-xs uppercase font-bold border-b">
-                            <tr>
-                                <th class="p-4 whitespace-nowrap">Waktu</th>
-                                <th class="p-4 whitespace-nowrap">Customer</th>
-                                <th class="p-4 whitespace-nowrap">Items</th>
-                                <th class="p-4 whitespace-nowrap">Metode</th>
-                                <th class="p-4 whitespace-nowrap text-right">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody id="report-table-body" class="divide-y divide-slate-100 text-slate-600">
-                            <tr><td colspan="5" class="p-6 text-center italic text-slate-400">Silakan pilih tanggal untuk melihat data.</td></tr>
-                        </tbody>
-                        <tfoot class="bg-slate-50 font-bold text-slate-700">
-                            <tr>
-                                <td colspan="4" class="p-4 text-right">TOTAL PERIODE INI:</td>
-                                <td class="p-4 text-right" id="report-total-sum">Rp 0</td>
-                            </tr>
-                        </tfoot>
+                        <thead class="bg-white text-slate-500 text-xs uppercase font-bold border-b"><tr><th class="p-4 whitespace-nowrap">Waktu</th><th class="p-4 whitespace-nowrap">Customer</th><th class="p-4 whitespace-nowrap">Items</th><th class="p-4 whitespace-nowrap">Metode</th><th class="p-4 whitespace-nowrap text-right">Total</th></tr></thead>
+                        <tbody id="report-table-body" class="divide-y divide-slate-100 text-slate-600"><tr><td colspan="5" class="p-6 text-center italic text-slate-400">Silakan pilih tanggal.</td></tr></tbody>
+                        <tfoot class="bg-slate-50 font-bold text-slate-700"><tr><td colspan="4" class="p-4 text-right">TOTAL PERIODE INI:</td><td class="p-4 text-right" id="report-total-sum">Rp 0</td></tr></tfoot>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- Hidden inputs for shift filter logic (Tab 1) -->
-        <input type="hidden" id="filter-start-time" value="00:00">
-        <input type="hidden" id="filter-end-time" value="23:59">
+        <!-- Hidden inputs -->
+        <input type="hidden" id="active-shift-filter" value="all">
     </div>
 
     <script type="module">
@@ -247,9 +266,8 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // State Variables
-        let todayOrders = [];
-        let reportOrders = []; // For Tab 3
+        // State
+        let allOrdersToday = [];
         let systemCashTotal = 0;
         let systemQrisTotalFullDay = 0;
         let chartInstance = null;
@@ -261,7 +279,6 @@
                 document.getElementById('main-content').classList.remove('filter', 'blur-md', 'pointer-events-none');
                 initDailyDashboard();
                 
-                // Set Default Date Pickers to Today
                 const todayStr = new Date().toISOString().slice(0,10);
                 document.getElementById('ana-start-date').value = todayStr;
                 document.getElementById('ana-end-date').value = todayStr;
@@ -276,16 +293,11 @@
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('btn-login'); btn.disabled = true; btn.textContent = "Verifying...";
-            try { 
-                await signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value); 
-            } catch (error) { 
-                document.getElementById('login-error').classList.remove('hidden'); 
-                btn.disabled = false; btn.textContent = "Masuk Dashboard"; 
-            }
+            try { await signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value); } 
+            catch (error) { document.getElementById('login-error').classList.remove('hidden'); btn.disabled = false; btn.textContent = "Masuk Dashboard"; }
         });
         document.getElementById('btn-logout').addEventListener('click', () => signOut(auth));
 
-        // --- TABS ---
         window.switchTab = function(tab) {
             document.querySelectorAll('.tab-view').forEach(el => el.classList.add('hidden'));
             document.getElementById('view-'+tab).classList.remove('hidden');
@@ -293,14 +305,13 @@
             document.getElementById('tab-'+tab).classList.add('active');
         }
 
-        // --- 1. DAILY OPS LOGIC (REAL TIME) ---
         function initDailyDashboard() {
             const today = new Date(); today.setHours(0,0,0,0);
             document.getElementById('header-date').textContent = today.toLocaleDateString('id-ID', {weekday: 'long', day:'numeric', month:'long'});
             
             const q = query(collection(db, "orders"), orderBy("createdAt", "desc"));
             onSnapshot(q, (snapshot) => {
-                todayOrders = [];
+                allOrdersToday = [];
                 systemQrisTotalFullDay = 0;
 
                 snapshot.forEach((doc) => {
@@ -308,10 +319,10 @@
                     if (!data.createdAt) return;
                     const orderDate = data.createdAt.toDate();
                     
-                    // Filter HANYA Hari Ini untuk Tab 1
+                    // Filter HANYA Hari Ini
                     if (orderDate.setHours(0,0,0,0) === today.getTime()) {
                         const formattedTime = doc.data().createdAt.toDate().toLocaleTimeString('id-ID', {hour12: false, hour: '2-digit', minute:'2-digit'});
-                        todayOrders.push({ ...data, formattedTime: formattedTime, rawDate: doc.data().createdAt.toDate() });
+                        allOrdersToday.push({ ...data, formattedTime: formattedTime, rawDate: doc.data().createdAt.toDate() });
 
                         if((data.paymentMethod||'').toLowerCase().includes('qris')) systemQrisTotalFullDay += (data.total || 0);
                     }
@@ -319,12 +330,9 @@
 
                 updateShiftCards();
                 updateBankPanel();
-                applyFilter(); // Update calculator
-            }, (error) => {
-                if(error.code === 'permission-denied') alert("Gagal akses data. Cek Rules Database.");
-            });
+                applyFilter(); // Recalculate calculator based on active filter
+            }, (error) => { if(error.code === 'permission-denied') alert("Gagal akses data. Cek Rules Database."); });
 
-            // Listen Bank Expenses
             const qExp = query(collection(db, "bank_expenses"), orderBy("timestamp", "desc"));
             onSnapshot(qExp, (snapshot) => {
                 const list = document.getElementById('bank-expense-list'); list.innerHTML = ''; let hasData = false;
@@ -340,28 +348,41 @@
             });
         }
 
+        // --- LOGIKA JAM SHIFT TERBARU (24 NOV REVISI) ---
+        function getShift(timeStr) {
+            // Shift 1: 08:00 - 15:59
+            if (timeStr >= '08:00' && timeStr < '16:00') return 's1';
+            // Shift 2: 16:00 - 22:59
+            if (timeStr >= '16:00' && timeStr < '23:00') return 's2';
+            // Shift 3: 23:00 - 23:59 ATAU 00:00 - 07:59
+            if (timeStr >= '23:00' || timeStr < '08:00') return 's3';
+            
+            return null;
+        }
+
         function updateShiftCards() {
             let s1={t:0,c:0,q:0}, s2={t:0,c:0,q:0}, s3={t:0,c:0,q:0};
-            todayOrders.forEach(o => {
-                const t = o.formattedTime; const amt = o.total||0; const isQris = (o.paymentMethod||'').toLowerCase().includes('qris');
-                if(t>='08:00' && t<='16:00') { s1.t+=amt; isQris?s1.q+=amt:s1.c+=amt; }
-                else if(t>'16:00' && t<='23:59') { s2.t+=amt; isQris?s2.q+=amt:s2.c+=amt; }
-                else if(t>='00:00' && t<'08:00') { s3.t+=amt; isQris?s3.q+=amt:s3.c+=amt; }
+            allOrdersToday.forEach(o => {
+                const t = o.formattedTime; 
+                const amt = o.total||0; 
+                const isQris = (o.paymentMethod||'').toLowerCase().includes('qris');
+                const shift = getShift(t);
+
+                if (shift === 's1') { s1.t+=amt; isQris?s1.q+=amt:s1.c+=amt; }
+                else if (shift === 's2') { s2.t+=amt; isQris?s2.q+=amt:s2.c+=amt; }
+                else if (shift === 's3') { s3.t+=amt; isQris?s3.q+=amt:s3.c+=amt; }
             });
+            
             const fmt = n => `Rp ${n.toLocaleString('id-ID')}`;
             document.getElementById('s1-total').innerText = fmt(s1.t); document.getElementById('s1-cash').innerText = s1.c.toLocaleString(); document.getElementById('s1-qris').innerText = s1.q.toLocaleString();
             document.getElementById('s2-total').innerText = fmt(s2.t); document.getElementById('s2-cash').innerText = s2.c.toLocaleString(); document.getElementById('s2-qris').innerText = s2.q.toLocaleString();
             document.getElementById('s3-total').innerText = fmt(s3.t); document.getElementById('s3-cash').innerText = s3.c.toLocaleString(); document.getElementById('s3-qris').innerText = s3.q.toLocaleString();
         }
 
-        function updateBankPanel() {
-            document.getElementById('bank-qris-system').innerText = `Rp ${systemQrisTotalFullDay.toLocaleString('id-ID')}`;
-            document.getElementById('est-net-receive').innerText = `Rp ${Math.round(systemQrisTotalFullDay * 0.993).toLocaleString('id-ID')}`;
-        }
-
-        window.setShift = function(start, end, btn) {
-            document.getElementById('filter-start-time').value = start;
-            document.getElementById('filter-end-time').value = end;
+        // CALCULATOR & FILTER
+        window.setShift = function(shiftCode, btn) {
+            document.getElementById('active-shift-filter').value = shiftCode;
+            
             document.querySelectorAll('.shift-btn').forEach(b => {
                 b.classList.remove('bg-blue-600','text-white','shadow-md','border-blue-600'); 
                 b.classList.add('bg-white','text-slate-600','border-slate-200');
@@ -374,9 +395,13 @@
         }
 
         window.applyFilter = function() {
-            const start = document.getElementById('filter-start-time').value;
-            const end = document.getElementById('filter-end-time').value;
-            const filtered = todayOrders.filter(o => o.formattedTime >= start && o.formattedTime <= end);
+            const shiftCode = document.getElementById('active-shift-filter').value;
+            
+            // Filter data sesuai shift yang dipilih
+            const filtered = allOrdersToday.filter(o => {
+                if (shiftCode === 'all') return true;
+                return getShift(o.formattedTime) === shiftCode;
+            });
             
             let cash = 0;
             filtered.forEach(o => {
@@ -393,6 +418,7 @@
             const modal = parseFloat(document.getElementById('input-modal-awal').value)||0;
             const laci = parseFloat(document.getElementById('input-fisik-akhir').value)||0;
             const bon = parseFloat(document.getElementById('input-pengeluaran').value)||0;
+            
             const fisikBersih = (laci - modal) + bon;
             const selisih = fisikBersih - systemCashTotal;
             
@@ -405,15 +431,22 @@
             if(document.getElementById('input-fisik-akhir').value === '') {
                 elAmt.className = "block font-black text-xl text-slate-400"; elSts.innerText = "Menunggu Input"; elSts.className = "text-[10px] bg-slate-200 px-2 py-0.5 rounded text-slate-500 font-bold";
             } else if (selisih === 0) {
-                elAmt.className = "block font-black text-xl text-green-600"; elSts.innerText = "✅ KLOP"; elSts.className = "text-[10px] bg-green-100 px-2 py-0.5 rounded text-green-800 font-bold";
+                elAmt.className = "block font-black text-xl text-green-600"; elSts.innerText = "✅ KLOP (AMAN)"; elSts.className = "text-[10px] bg-green-100 px-2 py-0.5 rounded text-green-800 font-bold";
             } else if (selisih < 0) {
-                elAmt.className = "block font-black text-xl text-red-600"; elSts.innerText = "⚠️ MINUS"; elSts.className = "text-[10px] bg-red-100 px-2 py-0.5 rounded text-red-800 font-bold";
+                elAmt.className = "block font-black text-xl text-red-600"; elSts.innerText = "⚠️ MINUS (KURANG)"; elSts.className = "text-[10px] bg-red-100 px-2 py-0.5 rounded text-red-800 font-bold";
             } else {
-                elAmt.className = "block font-black text-xl text-blue-600"; elSts.innerText = "ℹ️ SURPLUS"; elSts.className = "text-[10px] bg-blue-100 px-2 py-0.5 rounded text-blue-800 font-bold";
+                elAmt.className = "block font-black text-xl text-blue-600"; elSts.innerText = "ℹ️ SURPLUS (LEBIH)"; elSts.className = "text-[10px] bg-blue-100 px-2 py-0.5 rounded text-blue-800 font-bold";
             }
         }
         window.resetCalculator = function() { document.getElementById('input-modal-awal').value=''; document.getElementById('input-fisik-akhir').value=''; document.getElementById('input-pengeluaran').value=''; calculateClosing(); }
         
+        function updateBankPanel() {
+            const elSystem = document.getElementById('bank-qris-system');
+            const elNet = document.getElementById('est-net-receive');
+            if(elSystem) elSystem.innerText = `Rp ${systemQrisTotalFullDay.toLocaleString('id-ID')}`;
+            if(elNet) elNet.innerText = `Rp ${Math.round(systemQrisTotalFullDay * 0.993).toLocaleString('id-ID')}`;
+        }
+
         window.submitBankExpense = async function(e) {
             e.preventDefault();
             const btn = document.getElementById('btn-save-expense'); btn.disabled=true; btn.innerText="...";
@@ -430,20 +463,12 @@
             btn.disabled=false; btn.innerText="Simpan Catatan";
         }
 
-        // --- 2. HISTORICAL ANALYSIS LOGIC (TAB 2) ---
+        // --- ANALYTICS & REPORT LOGIC (TAB 2 & 3) ---
         window.loadHistoricalData = async function() {
             const start = new Date(document.getElementById('ana-start-date').value);
             const end = new Date(document.getElementById('ana-end-date').value);
-            // Set to end of day
             end.setHours(23, 59, 59, 999);
 
-            const listEl = document.getElementById('top-items-list');
-            listEl.innerHTML = '<p class="text-center mt-10 text-sm text-slate-400">Sedang mengambil data...</p>';
-
-            // Note: In a real app, you need composite index for range queries.
-            // Here we fetch a bit broadly then filter if index is missing, or use proper range if indexed.
-            // Assuming volume is manageable, we fetch ordered by date.
-            
             const q = query(
                 collection(db, "orders"), 
                 where("createdAt", ">=", Timestamp.fromDate(start)),
@@ -453,24 +478,12 @@
 
             try {
                 const snapshot = await getDocs(q);
-                let itemCounts = {};
-                let hourlySales = new Array(24).fill(0);
-
-                if (snapshot.empty) {
-                    listEl.innerHTML = '<p class="text-center mt-10 text-sm text-slate-400">Tidak ada data pada periode ini.</p>';
-                    updateCharts(hourlySales);
-                    return;
-                }
+                let itemCounts = {}; let hourlySales = new Array(24).fill(0);
 
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     const date = data.createdAt.toDate();
-                    const amt = data.total || 0;
-
-                    // Hourly Accumulation
-                    hourlySales[date.getHours()] += amt;
-
-                    // Items Accumulation
+                    hourlySales[date.getHours()] += (data.total || 0);
                     if (data.items && Array.isArray(data.items)) {
                         data.items.forEach(item => {
                             const name = item.name + (item.variant ? ` (${item.variant})` : '');
@@ -478,29 +491,10 @@
                         });
                     }
                 });
-
                 updateCharts(hourlySales);
-                
-                // Render Top Items
                 const sorted = Object.entries(itemCounts).sort((a,b)=>b[1]-a[1]).slice(0,10);
-                listEl.innerHTML = sorted.map(([name, count], i) => `
-                    <div class="flex justify-between items-center p-2 hover:bg-slate-50 rounded border-b border-slate-50 last:border-0 transition">
-                        <div class="flex items-center gap-3">
-                            <span class="font-bold ${i<3 ? 'text-yellow-500' : 'text-slate-300'} w-5 text-center">${i+1}</span>
-                            <span class="text-sm font-medium text-slate-700 truncate max-w-[200px]">${name}</span>
-                        </div>
-                        <span class="text-[10px] font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded-full">${count}x</span>
-                    </div>
-                `).join('');
-
-            } catch (error) {
-                console.error(error);
-                if(error.code === 'failed-precondition') {
-                    alert("Error: Perlu Index Firestore. Cek Console (F12) dan klik link yang muncul.");
-                } else {
-                    alert("Error mengambil data: " + error.message);
-                }
-            }
+                document.getElementById('top-items-list').innerHTML = sorted.length ? sorted.map(([n,c],i) => `<div class="flex justify-between p-2 border-b"><div class="flex gap-2"><span class="font-bold w-5">${i+1}</span><span>${n}</span></div><span class="bg-blue-100 px-2 rounded font-bold text-blue-700 text-xs">${c}x</span></div>`).join('') : '<p class="text-center text-sm text-gray-400 mt-4">Tidak ada data.</p>';
+            } catch (error) { alert("Error: " + error.message); }
         }
 
         function updateCharts(data) {
@@ -508,89 +502,48 @@
             if(chartInstance) chartInstance.destroy();
             chartInstance = new Chart(ctx, {
                 type: 'bar',
-                data: {
-                    labels: Array.from({length:24}, (_,i)=>`${String(i).padStart(2,'0')}:00`),
-                    datasets: [{ label: 'Total Penjualan (Rp)', data: data, backgroundColor: '#3b82f6', borderRadius: 4, hoverBackgroundColor: '#2563eb' }]
-                },
-                options: { 
-                    responsive: true, maintainAspectRatio: false, plugins: { legend: {display:false} }, 
-                    scales: { x: { grid:{display:false}, ticks:{font:{size:10}} }, y: { grid:{borderDash:[4,4]}, ticks:{callback: function(value){return value/1000 + 'k'}} } } 
-                }
+                data: { labels: Array.from({length:24}, (_,i)=>`${String(i).padStart(2,'0')}:00`), datasets: [{ label: 'Total (Rp)', data: data, backgroundColor: '#3b82f6', borderRadius: 4 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: {display:false} }, scales: { x: { grid:{display:false} }, y: { grid:{borderDash:[4,4]} } } }
             });
         }
 
-        // --- 3. REPORT DATA LOGIC (TAB 3) ---
         window.loadReportData = async function() {
             const start = new Date(document.getElementById('rep-start-date').value);
             const end = new Date(document.getElementById('rep-end-date').value);
             end.setHours(23, 59, 59, 999);
-
+            
             const tbody = document.getElementById('report-table-body');
-            tbody.innerHTML = '<tr><td colspan="5" class="p-6 text-center italic text-slate-400">Memuat data...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="p-6 text-center italic text-slate-400">Memuat...</td></tr>';
 
-            const q = query(
-                collection(db, "orders"), 
-                where("createdAt", ">=", Timestamp.fromDate(start)),
-                where("createdAt", "<=", Timestamp.fromDate(end)),
-                orderBy("createdAt", "desc")
-            );
-
+            const q = query(collection(db, "orders"), where("createdAt", ">=", Timestamp.fromDate(start)), where("createdAt", "<=", Timestamp.fromDate(end)), orderBy("createdAt", "desc"));
             try {
                 const snapshot = await getDocs(q);
-                reportOrders = []; // Store for export
-                let totalSum = 0;
-
-                if (snapshot.empty) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="p-6 text-center italic text-slate-400">Tidak ada data.</td></tr>';
-                    document.getElementById('report-total-sum').innerText = 'Rp 0';
-                    return;
-                }
-
-                let html = '';
+                let total = 0; let html = ''; let reportOrders = [];
                 snapshot.forEach(doc => {
                     const d = doc.data();
                     const tStr = d.createdAt.toDate().toLocaleTimeString('id-ID', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
-                    const isQris = (d.paymentMethod||'').toLowerCase().includes('qris');
-                    const itemsStr = (d.items||[]).map(i=>`${i.qty}x ${i.name}`).join(', ');
-                    
-                    reportOrders.push({ ...d, formattedTime: tStr, itemsStr });
-                    totalSum += (d.total || 0);
-
-                    html += `<tr class="hover:bg-slate-50 border-b border-slate-100 transition">
-                        <td class="p-4 text-xs text-slate-500 whitespace-nowrap font-mono">${tStr}</td>
-                        <td class="p-4 font-bold text-slate-700 whitespace-nowrap">${d.customer}</td>
-                        <td class="p-4 text-xs text-slate-500 truncate max-w-[150px]" title="${itemsStr}">${itemsStr}</td>
-                        <td class="p-4 whitespace-nowrap"><span class="px-2 py-1 rounded text-[10px] font-bold uppercase ${isQris?'bg-green-100 text-green-700':'bg-yellow-100 text-yellow-700'}">${d.paymentMethod}</span></td>
-                        <td class="p-4 text-right font-bold text-slate-700 whitespace-nowrap">Rp ${(d.total||0).toLocaleString('id-ID')}</td>
-                    </tr>`;
+                    const iStr = (d.items||[]).map(i=>`${i.qty}x ${i.name}`).join(', ');
+                    reportOrders.push({...d, tStr, iStr});
+                    total += (d.total||0);
+                    html += `<tr class="hover:bg-slate-50 border-b"><td class="p-4 text-xs">${tStr}</td><td class="p-4 font-bold">${d.customer}</td><td class="p-4 text-xs truncate max-w-[150px]">${iStr}</td><td class="p-4">${d.paymentMethod}</td><td class="p-4 text-right font-bold">Rp ${(d.total||0).toLocaleString('id-ID')}</td></tr>`;
                 });
-
-                tbody.innerHTML = html;
-                document.getElementById('report-total-sum').innerText = `Rp ${totalSum.toLocaleString('id-ID')}`;
-                document.getElementById('report-title').innerText = `Hasil Pencarian (${snapshot.size} Transaksi)`;
-
-            } catch (error) {
-                console.error(error);
-                if(error.code === 'failed-precondition') {
-                    alert("ERROR: Index Firestore diperlukan untuk filter tanggal.\n\nSilakan BUKA CONSOLE BROWSER (F12 -> Console). Klik link yang muncul dari Firebase untuk membuat index otomatis.");
-                } else {
-                    alert("Gagal memuat laporan: " + error.message);
-                }
-            }
+                tbody.innerHTML = html || '<tr><td colspan="5" class="p-6 text-center italic text-slate-400">Tidak ada data.</td></tr>';
+                document.getElementById('report-total-sum').innerText = `Rp ${total.toLocaleString('id-ID')}`;
+                
+                // Attach data to window for export
+                window.currentReportData = reportOrders;
+            } catch (e) { alert("Error: " + e.message); }
         }
 
         window.downloadReportCSV = function() {
-            if (reportOrders.length === 0) return alert("Tampilkan data terlebih dahulu.");
+            if (!window.currentReportData || window.currentReportData.length === 0) return alert("Tampilkan data dulu.");
             let csv = "Waktu,Customer,Items,Metode,Total\n";
-            reportOrders.forEach(o => {
-                csv += `${o.formattedTime},"${o.customer}","${o.itemsStr}",${o.paymentMethod},${o.total}\n`;
-            });
+            window.currentReportData.forEach(o => csv += `${o.tStr},"${o.customer}","${o.iStr}",${o.paymentMethod},${o.total}\n`);
             const link = document.createElement("a");
             link.href = "data:text/csv;charset=utf-8," + encodeURI(csv);
-            link.download = `Laporan_Payboss_Export.csv`;
+            link.download = "Laporan_Payboss.csv";
             link.click();
         }
-
     </script>
 </body>
 </html>
