@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payboss - Super Dashboard</title>
+    <title>Payboss - Super Dashboard (Fixed)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -309,20 +309,28 @@
             const today = new Date(); today.setHours(0,0,0,0);
             document.getElementById('header-date').textContent = today.toLocaleDateString('id-ID', {weekday: 'long', day:'numeric', month:'long'});
             
-            const q = query(collection(db, "orders"), orderBy("createdAt", "desc"));
+            // [PERBAIKAN UTAMA] Mengubah source collection dari 'orders' menjadi 'completedOrders'
+            // Kita gunakan 'completedAt' sebagai acuan waktu karena itu saat uang masuk
+            const q = query(collection(db, "completedOrders"), orderBy("completedAt", "desc"));
+            
             onSnapshot(q, (snapshot) => {
                 allOrdersToday = [];
                 systemQrisTotalFullDay = 0;
 
                 snapshot.forEach((doc) => {
                     const data = doc.data();
-                    if (!data.createdAt) return;
-                    const orderDate = data.createdAt.toDate();
+                    // Gunakan completedAt, fallback ke createdAt jika data lama
+                    const timeField = data.completedAt || data.createdAt;
+                    if (!timeField) return;
+                    
+                    const orderDate = timeField.toDate();
                     
                     // Filter HANYA Hari Ini
                     if (orderDate.setHours(0,0,0,0) === today.getTime()) {
-                        const formattedTime = doc.data().createdAt.toDate().toLocaleTimeString('id-ID', {hour12: false, hour: '2-digit', minute:'2-digit'});
-                        allOrdersToday.push({ ...data, formattedTime: formattedTime, rawDate: doc.data().createdAt.toDate() });
+                        const formattedTime = timeField.toDate().toLocaleTimeString('id-ID', {hour12: false, hour: '2-digit', minute:'2-digit'});
+                        
+                        // Kita tambahkan rawDate untuk sorting/filtering lebih lanjut jika perlu
+                        allOrdersToday.push({ ...data, formattedTime: formattedTime, rawDate: timeField.toDate() });
 
                         if((data.paymentMethod||'').toLowerCase().includes('qris')) systemQrisTotalFullDay += (data.total || 0);
                     }
@@ -330,8 +338,11 @@
 
                 updateShiftCards();
                 updateBankPanel();
-                applyFilter(); // Recalculate calculator based on active filter
-            }, (error) => { if(error.code === 'permission-denied') alert("Gagal akses data. Cek Rules Database."); });
+                applyFilter(); 
+            }, (error) => { 
+                console.error(error);
+                if(error.code === 'permission-denied') alert("Gagal akses data. Cek Rules Database."); 
+            });
 
             const qExp = query(collection(db, "bank_expenses"), orderBy("timestamp", "desc"));
             onSnapshot(qExp, (snapshot) => {
@@ -464,16 +475,17 @@
         }
 
         // --- ANALYTICS & REPORT LOGIC (TAB 2 & 3) ---
+        // [PERBAIKAN] Di sini juga harus query ke 'completedOrders'
         window.loadHistoricalData = async function() {
             const start = new Date(document.getElementById('ana-start-date').value);
             const end = new Date(document.getElementById('ana-end-date').value);
             end.setHours(23, 59, 59, 999);
 
             const q = query(
-                collection(db, "orders"), 
-                where("createdAt", ">=", Timestamp.fromDate(start)),
-                where("createdAt", "<=", Timestamp.fromDate(end)),
-                orderBy("createdAt", "desc") 
+                collection(db, "completedOrders"), // <--- GANTI KE completedOrders
+                where("completedAt", ">=", Timestamp.fromDate(start)), // Gunakan completedAt
+                where("completedAt", "<=", Timestamp.fromDate(end)),
+                orderBy("completedAt", "desc") 
             );
 
             try {
@@ -482,7 +494,8 @@
 
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    const date = data.createdAt.toDate();
+                    // Gunakan completedAt jika ada, fallback createdAt
+                    const date = (data.completedAt || data.createdAt).toDate();
                     hourlySales[date.getHours()] += (data.total || 0);
                     if (data.items && Array.isArray(data.items)) {
                         data.items.forEach(item => {
@@ -507,6 +520,7 @@
             });
         }
 
+        // [PERBAIKAN] Report data juga harus dari completedOrders
         window.loadReportData = async function() {
             const start = new Date(document.getElementById('rep-start-date').value);
             const end = new Date(document.getElementById('rep-end-date').value);
@@ -515,13 +529,20 @@
             const tbody = document.getElementById('report-table-body');
             tbody.innerHTML = '<tr><td colspan="5" class="p-6 text-center italic text-slate-400">Memuat...</td></tr>';
 
-            const q = query(collection(db, "orders"), where("createdAt", ">=", Timestamp.fromDate(start)), where("createdAt", "<=", Timestamp.fromDate(end)), orderBy("createdAt", "desc"));
+            const q = query(
+                collection(db, "completedOrders"), // <--- GANTI KE completedOrders
+                where("completedAt", ">=", Timestamp.fromDate(start)),
+                where("completedAt", "<=", Timestamp.fromDate(end)), 
+                orderBy("completedAt", "desc")
+            );
+            
             try {
                 const snapshot = await getDocs(q);
                 let total = 0; let html = ''; let reportOrders = [];
                 snapshot.forEach(doc => {
                     const d = doc.data();
-                    const tStr = d.createdAt.toDate().toLocaleTimeString('id-ID', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+                    const timeField = d.completedAt || d.createdAt;
+                    const tStr = timeField.toDate().toLocaleTimeString('id-ID', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
                     const iStr = (d.items||[]).map(i=>`${i.qty}x ${i.name}`).join(', ');
                     reportOrders.push({...d, tStr, iStr});
                     total += (d.total||0);
