@@ -3,568 +3,653 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payboss - Super Dashboard (Fixed)</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>PayBoss - Kas & Insight</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; }
-        .glass-card { background: white; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; }
-        .nav-item { cursor: pointer; transition: all 0.3s ease; border-bottom: 3px solid transparent; color: #64748b; }
-        .nav-item:hover { color: #1e293b; }
-        .nav-item.active { border-bottom-color: #3b82f6; color: #3b82f6; font-weight: bold; }
-        .fade-in { animation: fadeIn 0.3s ease-in; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        body {
+            box-sizing: border-box; margin: 0; padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #8B4513 0%, #D2B48C 100%);
+            min-height: 100vh;
+        }
+        .hidden { display: none !important; }
+
+        /* App Styles */
+        html { height: 100%; }
+        .nav-bar {
+            background: rgba(62, 39, 35, 0.95); padding: 10px 20px; display: flex;
+            justify-content: center; align-items: center; position: sticky;
+            top: 0; z-index: 1000; backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        .nav-brand { color: #D2B48C; font-size: 1.2rem; font-weight: bold; text-decoration: none; }
+        .nav-menu { display: flex; gap: 10px; margin-left: 20px; }
+        .nav-btn {
+            background: transparent; border: 1px solid #D2B48C; color: #D2B48C;
+            padding: 5px 15px; border-radius: 20px; cursor: pointer; transition: 0.3s;
+        }
+        .nav-btn.active, .nav-btn:hover { background: #D2B48C; color: #3E2723; }
+
+        .container { max-width: 1000px; margin: 0 auto; padding: 15px; }
+        .page {
+            background: rgba(255, 255, 255, 0.98); border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); overflow: hidden; margin-bottom: 20px;
+            animation: fadeIn 0.5s ease; padding: 20px;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .page-header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 15px; }
+        .page-header h1 { margin: 0; color: #3E2723; font-size: 1.8rem; }
+        .page-header p { margin: 5px 0 0; color: #666; font-size: 0.9rem; }
+
+        /* CASH FLOW STYLES */
+        .shift-selector {
+            background: #f8f9fa; padding: 15px; border-radius: 10px; border: 1px solid #ddd;
+            display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; align-items: center;
+            margin-bottom: 20px;
+        }
+        .shift-selector input, .shift-selector select { padding: 10px; border-radius: 5px; border: 1px solid #ccc; }
+        
+        .money-card-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px;
+        }
+        .money-card {
+            background: #fff; border: 1px solid #eee; border-radius: 10px; padding: 15px;
+            text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .money-card.highlight { background: #e8f5e9; border-color: #c8e6c9; }
+        .money-card.highlight .val { color: #2e7d32; }
+        .money-card.expense { background: #ffebee; border-color: #ffcdd2; }
+        .money-card.expense .val { color: #c62828; }
+
+        .money-card label { display: block; font-size: 0.85rem; color: #666; margin-bottom: 5px; font-weight: bold; }
+        .money-card .val { font-size: 1.4rem; font-weight: bold; color: #3E2723; }
+        .money-card small { font-size: 0.8rem; color: #888; }
+
+        .cash-action-area {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+        }
+        @media(max-width: 700px) { .cash-action-area { grid-template-columns: 1fr; } }
+
+        .action-box { border: 1px solid #ddd; border-radius: 10px; padding: 15px; }
+        .action-box h4 { margin-top: 0; color: #3E2723; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        
+        .form-row { display: flex; gap: 10px; margin-bottom: 10px; }
+        .form-row input { flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 5px; }
+        
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-primary { background: #8B4513; color: white; }
+        .btn-danger { background: #d32f2f; color: white; }
+        .btn-success { background: #2e7d32; color: white; }
+        .btn:hover { opacity: 0.9; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+
+        .expense-list { margin-top: 10px; max-height: 200px; overflow-y: auto; }
+        .expense-item { 
+            display: flex; justify-content: space-between; padding: 8px; 
+            border-bottom: 1px dashed #eee; font-size: 0.9rem; 
+        }
+        .expense-time { color: #888; font-size: 0.8rem; margin-right: 5px; }
+
+        /* ANALYTICS STYLES (Existing) */
+        .chart-container { position: relative; height: 250px; width: 100%; margin-bottom: 10px; }
+        .insight-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        @media(max-width: 700px) { .insight-grid { grid-template-columns: 1fr; } }
+        
+        .combo-item { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
+        
+        /* Loading */
+        #loading-overlay { 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: white; z-index: 3000; display: flex; 
+            justify-content: center; align-items: center; flex-direction: column; 
+        }
+        .loader { 
+            border: 5px solid #f3f3f3; border-top: 5px solid #8B4513; 
+            border-radius: 50%; width: 40px; height: 40px; 
+            animation: spin 1s linear infinite; margin-bottom: 15px; 
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body class="text-slate-800 min-h-screen relative pb-20">
+<body>
 
-    <!-- LOGIN MODAL -->
-    <div id="login-modal" class="fixed inset-0 bg-slate-900 bg-opacity-95 z-[9999] flex items-center justify-center backdrop-blur-sm transition-all duration-300">
-        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm text-center">
-            <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-user-tie text-2xl text-blue-600"></i>
-            </div>
-            <h2 class="text-2xl font-bold text-slate-800">Manager Area</h2>
-            <form id="login-form" class="space-y-4 mt-6">
-                <input type="email" id="email" required placeholder="Email" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-                <input type="password" id="password" required placeholder="Password" class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
-                <div id="login-error" class="text-red-500 text-xs hidden font-bold">Akses Ditolak.</div>
-                <button type="submit" id="btn-login" class="w-full py-3 bg-slate-800 text-white rounded-lg font-bold hover:bg-slate-700 transition">Masuk Dashboard</button>
-            </form>
-        </div>
+    <div id="loading-overlay">
+        <div class="loader"></div>
+        <h3 style="color: #3E2723;">Memuat Sistem...</h3>
     </div>
 
-    <!-- MAIN CONTENT -->
-    <div id="main-content" class="filter blur-md pointer-events-none transition duration-500 max-w-7xl mx-auto p-4 md:p-6">
+    <nav class="nav-bar">
+        <a href="#" class="nav-brand">☕ PayBoss</a>
+        <div class="nav-menu">
+            <button class="nav-btn active" onclick="switchPage('cash')">💵 Kas & Shift</button>
+            <button class="nav-btn" onclick="switchPage('analytics')">📊 Analisis Data</button>
+        </div>
+    </nav>
+
+    <div class="container">
         
-        <!-- Header -->
-        <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
-            <div>
-                <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
-                    <i class="fas fa-chart-pie text-blue-600"></i> Payboss Analytics
-                </h1>
-                <p class="text-slate-500 text-sm">Laporan Harian & Kontrol Keuangan</p>
+        <!-- HALAMAN MANAJEMEN KAS (NEW) -->
+        <div id="cash-page" class="page">
+            <div class="page-header">
+                <h1>Laporan Keuangan Per Shift</h1>
+                <p>Kontrol Uang Fisik, Modal & Pengeluaran Kasir</p>
             </div>
-            <div class="flex items-center gap-3">
-                <div class="bg-white px-4 py-2 rounded-lg shadow border text-right">
-                    <p class="text-[10px] uppercase font-bold text-slate-400">Tanggal Laporan</p>
-                    <p id="header-date" class="font-bold text-sm text-blue-600">Loading...</p>
+
+            <!-- Kontrol Shift -->
+            <div class="shift-selector">
+                <div>
+                    <label style="font-size:0.8rem; font-weight:bold;">Tanggal:</label>
+                    <input type="date" id="cash-date">
                 </div>
-                <button id="btn-logout" class="p-2 text-red-600 hover:bg-red-50 rounded-lg border border-red-200"><i class="fas fa-sign-out-alt"></i></button>
+                <div>
+                    <label style="font-size:0.8rem; font-weight:bold;">Pilih Shift:</label>
+                    <select id="cash-shift">
+                        <option value="1">Shift 1 (08:00 - 15:59)</option>
+                        <option value="2">Shift Siang (16:00 - 22:59)</option>
+                        <option value="3">Shift Malam (23:00 - 07:59)</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" id="btn-load-shift">🔍 Buka Laporan</button>
+            </div>
+
+            <div id="shift-content" class="hidden">
+                
+                <!-- Input Modal Awal (Jika belum diisi) -->
+                <div id="modal-input-section" class="action-box" style="text-align:center; background:#fff8e1; border:1px solid #ffecb3; margin-bottom:20px;">
+                    <h3 style="margin-top:0;">⚠️ Modal Awal Belum Dimasukkan</h3>
+                    <p>Masukkan jumlah uang tunai yang ada di laci sebelum memulai shift ini.</p>
+                    <div style="display:flex; justify-content:center; gap:10px; max-width:300px; margin:0 auto;">
+                        <input type="number" id="input-modal" placeholder="Rp 0" style="padding:10px; width:100%;">
+                        <button class="btn btn-success" id="btn-save-modal">Simpan</button>
+                    </div>
+                </div>
+
+                <!-- Dashboard Angka -->
+                <div id="shift-dashboard" class="hidden">
+                    <div class="money-card-grid">
+                        <div class="money-card">
+                            <label>Modal Awal</label>
+                            <div class="val" id="disp-modal">Rp 0</div>
+                            <small>Start Laci</small>
+                        </div>
+                        <div class="money-card">
+                            <label>Pendapatan Cash</label>
+                            <div class="val" id="disp-cash-in" style="color:#2e7d32;">+ Rp 0</div>
+                            <small>Dari Penjualan Tunai</small>
+                        </div>
+                        <div class="money-card expense">
+                            <label>Pengeluaran (Bon)</label>
+                            <div class="val" id="disp-expenses">- Rp 0</div>
+                            <small>Ambil dari Laci</small>
+                        </div>
+                        <div class="money-card highlight">
+                            <label>Uang Fisik di Laci</label>
+                            <div class="val" id="disp-drawer-total">Rp 0</div>
+                            <small>(Modal + Cash) - Bon</small>
+                        </div>
+                         <div class="money-card" style="background:#f3e5f5; border-color:#e1bee7;">
+                            <label>Total QRIS/Transfer</label>
+                            <div class="val" id="disp-qris-in" style="color:#6a1b9a;">Rp 0</div>
+                            <small>Masuk ke Rekening</small>
+                        </div>
+                    </div>
+
+                    <!-- Area Input Pengeluaran & Ringkasan -->
+                    <div class="cash-action-area">
+                        <!-- Input Pengeluaran -->
+                        <div class="action-box">
+                            <h4>📝 Catat Pengeluaran (Bon)</h4>
+                            <div class="form-row">
+                                <input type="text" id="exp-desc" placeholder="Keperluan (Es, Gas, dll)">
+                            </div>
+                            <div class="form-row">
+                                <input type="number" id="exp-amount" placeholder="Nominal (Rp)">
+                                <button class="btn btn-danger" id="btn-add-expense">Catat</button>
+                            </div>
+                            <div class="expense-list" id="expense-history-list">
+                                <!-- List Item -->
+                            </div>
+                        </div>
+
+                        <!-- Ringkasan Shift -->
+                        <div class="action-box" style="background:#f9f9f9;">
+                            <h4>📋 Ringkasan Shift</h4>
+                            <p id="shift-summary-text" style="line-height:1.6; font-size:0.95rem; color:#444;">
+                                Memuat data...
+                            </p>
+                            <button class="btn btn-primary" style="width:100%; margin-top:10px;" id="btn-print-shift">🖨️ Cetak Laporan Shift</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- NAVIGATION TABS -->
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 mb-6 flex overflow-x-auto">
-            <div onclick="switchTab('ops')" id="tab-ops" class="nav-item active flex-1 py-4 text-center min-w-[150px]">
-                <i class="fas fa-cash-register mr-2"></i> Closing & Bank
+        <!-- HALAMAN ANALISIS DATA (EXISTING) -->
+        <div id="analytics-page" class="page hidden">
+            <div class="page-header">
+                <h1>📊 Analisis Penjualan</h1>
+                <p>Tren Penjualan & Perilaku Pelanggan</p>
             </div>
-            <div onclick="switchTab('analytics')" id="tab-analytics" class="nav-item flex-1 py-4 text-center min-w-[150px]">
-                <i class="fas fa-chart-line mr-2"></i> Analisis Toko
-            </div>
-            <div onclick="switchTab('data')" id="tab-data" class="nav-item flex-1 py-4 text-center min-w-[150px]">
-                <i class="fas fa-table mr-2"></i> Data Transaksi
-            </div>
-        </div>
-
-        <!-- === TAB 1: OPERASIONAL === -->
-        <div id="view-ops" class="tab-view fade-in">
             
-            <!-- Shift Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <!-- Shift 1 (Pagi) -->
-                <div class="glass-card p-5 border-l-4 border-yellow-400 relative overflow-hidden group">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <span class="text-xs font-bold text-slate-400 uppercase">Shift 1 (Pagi)</span>
-                            <div class="text-2xl font-bold text-slate-800 mt-1" id="s1-total">Rp 0</div>
-                        </div>
-                        <span class="bg-yellow-100 text-yellow-800 text-[10px] px-2 py-1 rounded font-bold">08:00 - 16:00</span>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2 mt-4 text-xs border-t pt-2 border-slate-100">
-                        <div class="bg-slate-50 p-1.5 rounded">Cash: <span id="s1-cash" class="font-bold text-slate-700">0</span></div>
-                        <div class="bg-green-50 p-1.5 rounded">QRIS: <span id="s1-qris" class="font-bold text-green-700">0</span></div>
-                    </div>
+            <div class="shift-selector">
+                <label>Filter:</label>
+                <input type="date" id="start-date">
+                <span>s/d</span>
+                <input type="date" id="end-date">
+                <button id="load-analytics-btn" class="btn btn-primary">Analisis</button>
+            </div>
+
+            <div class="money-card-grid">
+                <div class="money-card">
+                    <label>Total Omzet Periodik</label>
+                    <div class="val" id="anl-total-sales">Rp 0</div>
                 </div>
-                <!-- Shift 2 (Sore) -->
-                <div class="glass-card p-5 border-l-4 border-orange-400 relative overflow-hidden group">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <span class="text-xs font-bold text-slate-400 uppercase">Shift 2 (Sore)</span>
-                            <div class="text-2xl font-bold text-slate-800 mt-1" id="s2-total">Rp 0</div>
-                        </div>
-                        <span class="bg-orange-100 text-orange-800 text-[10px] px-2 py-1 rounded font-bold">16:00 - 23:00</span>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2 mt-4 text-xs border-t pt-2 border-slate-100">
-                        <div class="bg-slate-50 p-1.5 rounded">Cash: <span id="s2-cash" class="font-bold text-slate-700">0</span></div>
-                        <div class="bg-green-50 p-1.5 rounded">QRIS: <span id="s2-qris" class="font-bold text-green-700">0</span></div>
-                    </div>
-                </div>
-                <!-- Shift 3 (Malam) -->
-                <div class="glass-card p-5 border-l-4 border-blue-500 relative overflow-hidden group">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <span class="text-xs font-bold text-slate-400 uppercase">Shift 3 (Malam)</span>
-                            <div class="text-2xl font-bold text-slate-800 mt-1" id="s3-total">Rp 0</div>
-                        </div>
-                        <span class="bg-blue-100 text-blue-800 text-[10px] px-2 py-1 rounded font-bold">23:00 - 08:00</span>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2 mt-4 text-xs border-t pt-2 border-slate-100">
-                        <div class="bg-slate-50 p-1.5 rounded">Cash: <span id="s3-cash" class="font-bold text-slate-700">0</span></div>
-                        <div class="bg-green-50 p-1.5 rounded">QRIS: <span id="s3-qris" class="font-bold text-green-700">0</span></div>
-                    </div>
+                <div class="money-card">
+                    <label>Total Transaksi</label>
+                    <div class="val" id="anl-total-orders">0</div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Calculator -->
-                <div class="glass-card p-6">
-                    <div class="flex justify-between items-center mb-4 pb-2 border-b border-slate-100">
-                        <h3 class="font-bold text-slate-700 flex items-center gap-2"><i class="fas fa-calculator text-blue-500"></i> Closing Kasir</h3>
-                        <button onclick="resetCalculator()" class="text-xs bg-slate-200 hover:bg-slate-300 px-3 py-1 rounded transition">Reset Form</button>
-                    </div>
-                    
-                    <!-- Tombol Shift (Diperbarui Onclick-nya) -->
-                    <div class="flex gap-2 mb-4 overflow-x-auto pb-2">
-                        <button onclick="setShift('s1', this)" class="shift-btn flex-1 py-2 px-3 rounded text-xs font-bold border transition text-slate-600 hover:bg-blue-50">S1 (08-16)</button>
-                        <button onclick="setShift('s2', this)" class="shift-btn flex-1 py-2 px-3 rounded text-xs font-bold border transition text-slate-600 hover:bg-blue-50">S2 (16-23)</button>
-                        <button onclick="setShift('s3', this)" class="shift-btn flex-1 py-2 px-3 rounded text-xs font-bold border transition text-slate-600 hover:bg-blue-50">S3 (23-08)</button>
-                        <button onclick="setShift('all', this)" class="shift-btn flex-1 py-2 px-3 rounded text-xs font-bold bg-blue-600 text-white shadow-md border-blue-600">ALL</button>
-                    </div>
-
-                    <div class="space-y-4">
-                        <!-- Inputs -->
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Modal Awal</label>
-                                <input type="number" id="input-modal-awal" oninput="calculateClosing()" class="w-full p-2 border rounded text-right font-mono text-sm outline-none focus:border-blue-500" placeholder="0">
-                            </div>
-                            <div>
-                                <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Bon / Pengeluaran</label>
-                                <input type="number" id="input-pengeluaran" oninput="calculateClosing()" class="w-full p-2 border rounded text-right font-mono text-sm text-orange-600 outline-none focus:border-orange-500" placeholder="0">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-slate-400 uppercase block mb-1">Total Uang Fisik (Hitungan Akhir)</label>
-                            <input type="number" id="input-fisik-akhir" oninput="calculateClosing()" class="w-full p-3 border-2 border-blue-200 rounded text-right font-bold text-lg outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100" placeholder="0">
-                        </div>
-                        
-                        <!-- Hasil Rekonsiliasi -->
-                        <div class="bg-slate-50 p-4 rounded-xl border mt-2">
-                            <div class="flex justify-between text-xs mb-2">
-                                <span class="text-slate-500">Target Sistem (Cash):</span>
-                                <span id="system-cash-display" class="font-bold text-slate-700">Rp 0</span>
-                            </div>
-                            <div class="flex justify-between text-xs mb-2 border-b border-slate-200 pb-2">
-                                <span class="text-slate-500">Target Fisik (Laci - Modal + Bon):</span>
-                                <span id="calculated-physical-revenue" class="font-bold text-blue-600">Rp 0</span>
-                            </div>
-                            <div class="flex justify-between items-center pt-2">
-                                <span class="font-bold text-slate-700 text-sm">Selisih (Variance):</span>
-                                <div class="text-right">
-                                    <span id="variance-amount" class="block font-black text-xl text-slate-400">Rp 0</span>
-                                    <span id="variance-status" class="text-[10px] bg-slate-200 px-2 py-0.5 rounded text-slate-500 font-bold">Menunggu Input</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            <div class="insight-grid">
+                <div>
+                    <h3 style="text-align:center;">⏰ Tren Jam Sibuk</h3>
+                    <div class="chart-container"><canvas id="peakHourChart"></canvas></div>
                 </div>
-
-                <!-- Bank Control -->
-                <div class="glass-card p-6">
-                    <h3 class="font-bold text-slate-700 mb-4 border-b pb-2 flex items-center gap-2">
-                        <i class="fas fa-university text-green-600"></i> Kontrol Bank & QRIS
-                    </h3>
-                    <div class="bg-green-50 p-4 rounded-xl border border-green-100 mb-6">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-xs font-bold text-green-800 uppercase">Total QRIS Hari Ini</span>
-                            <i class="fas fa-qrcode text-green-600 opacity-50"></i>
-                        </div>
-                        <div class="flex justify-between items-end">
-                            <span id="bank-qris-system" class="text-2xl font-black text-green-700">Rp 0</span>
-                            <div class="text-right">
-                                <p class="text-[10px] text-green-600">Est. Bersih (MDR 0.7%)</p>
-                                <p id="est-net-receive" class="font-bold text-green-800">Rp 0</p>
-                            </div>
-                        </div>
-                    </div>
-                    <form onsubmit="submitBankExpense(event)" class="space-y-3 bg-white p-1 rounded">
-                        <p class="text-xs font-bold text-slate-400 uppercase">Catat Pengeluaran Transfer</p>
-                        <div class="flex gap-2">
-                            <input type="text" id="expense-desc" required placeholder="Ket (Misal: Beli Gula)" class="flex-1 p-2 border rounded text-sm outline-none focus:border-blue-500">
-                            <input type="number" id="expense-amount" required placeholder="Rp" class="w-24 p-2 border rounded text-sm outline-none focus:border-blue-500">
-                        </div>
-                        <button type="submit" id="btn-save-expense" class="w-full bg-slate-800 text-white py-2 rounded text-xs font-bold hover:bg-slate-700 transition">Simpan Catatan</button>
-                    </form>
-                    <div class="mt-4 max-h-32 overflow-y-auto space-y-1" id="bank-expense-list"></div>
+                <div>
+                    <h3 style="text-align:center;">📅 Tren Hari Sibuk</h3>
+                    <div class="chart-container"><canvas id="peakDayChart"></canvas></div>
                 </div>
+            </div>
+            
+            <div style="margin-top:20px;">
+                <h3 style="border-bottom:1px solid #eee; padding-bottom:10px;">🏆 Top Menu & Kombinasi</h3>
+                <div id="combo-insight-list"></div>
             </div>
         </div>
 
-        <!-- === TAB 2: ANALISIS === -->
-        <div id="view-analytics" class="tab-view hidden fade-in">
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6 flex flex-wrap items-center gap-4">
-                <div class="flex items-center gap-2"><span class="text-xs font-bold text-slate-500">Dari:</span><input type="date" id="ana-start-date" class="p-2 border rounded text-sm"></div>
-                <div class="flex items-center gap-2"><span class="text-xs font-bold text-slate-500">Sampai:</span><input type="date" id="ana-end-date" class="p-2 border rounded text-sm"></div>
-                <button onclick="loadHistoricalData()" class="bg-blue-600 text-white px-4 py-2 rounded text-sm font-bold hover:bg-blue-700 shadow"><i class="fas fa-search mr-1"></i> Tampilkan Data</button>
-            </div>
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="glass-card p-6 lg:col-span-2">
-                    <h3 class="font-bold text-slate-700 mb-4 flex items-center gap-2"><i class="fas fa-clock text-blue-500"></i> Distribusi Jam Ramai</h3>
-                    <div class="h-80 w-full"><canvas id="hourlyChart"></canvas></div>
-                </div>
-                <div class="glass-card p-6">
-                    <h3 class="font-bold text-slate-700 mb-4 flex items-center gap-2"><i class="fas fa-crown text-yellow-500"></i> Menu Terlaris</h3>
-                    <div class="space-y-2 overflow-y-auto h-80 pr-2" id="top-items-list"><p class="text-center text-slate-400 text-sm mt-10">Pilih tanggal & klik Tampilkan.</p></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- === TAB 3: DATA === -->
-        <div id="view-data" class="tab-view hidden fade-in">
-            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6 flex flex-wrap items-center gap-4 justify-between">
-                <div class="flex gap-4">
-                    <div class="flex items-center gap-2"><span class="text-xs font-bold text-slate-500">Dari:</span><input type="date" id="rep-start-date" class="p-2 border rounded text-sm"></div>
-                    <div class="flex items-center gap-2"><span class="text-xs font-bold text-slate-500">Sampai:</span><input type="date" id="rep-end-date" class="p-2 border rounded text-sm"></div>
-                    <button onclick="loadReportData()" class="bg-blue-600 text-white px-4 py-2 rounded text-sm font-bold hover:bg-blue-700 shadow"><i class="fas fa-search mr-1"></i> Cari</button>
-                </div>
-                <button onclick="downloadReportCSV()" class="text-xs bg-green-600 text-white px-3 py-2 rounded font-bold hover:bg-green-700 flex items-center gap-2 shadow"><i class="fas fa-file-excel"></i> Export CSV</button>
-            </div>
-            <div class="glass-card overflow-hidden">
-                <div class="p-4 bg-slate-50 border-b border-slate-200"><h3 class="font-bold text-slate-700" id="report-title">Hasil Pencarian</h3></div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
-                        <thead class="bg-white text-slate-500 text-xs uppercase font-bold border-b"><tr><th class="p-4 whitespace-nowrap">Waktu</th><th class="p-4 whitespace-nowrap">Customer</th><th class="p-4 whitespace-nowrap">Items</th><th class="p-4 whitespace-nowrap">Metode</th><th class="p-4 whitespace-nowrap text-right">Total</th></tr></thead>
-                        <tbody id="report-table-body" class="divide-y divide-slate-100 text-slate-600"><tr><td colspan="5" class="p-6 text-center italic text-slate-400">Silakan pilih tanggal.</td></tr></tbody>
-                        <tfoot class="bg-slate-50 font-bold text-slate-700"><tr><td colspan="4" class="p-4 text-right">TOTAL PERIODE INI:</td><td class="p-4 text-right" id="report-total-sum">Rp 0</td></tr></tfoot>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Hidden inputs -->
-        <input type="hidden" id="active-shift-filter" value="all">
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, collection, query, where, onSnapshot, orderBy, addDoc, serverTimestamp, getDocs, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, collection, doc, getDoc, setDoc, updateDoc, query, where, getDocs, Timestamp, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyB0nHqdAw_dV9pHcQ_cSnWtNsn4CwwwUNc",
-            authDomain: "payboss-cafe-system.firebaseapp.com",
-            projectId: "payboss-cafe-system",
-            storageBucket: "payboss-cafe-system.appspot.com",
-            messagingSenderId: "570523503793",
-            appId: "1:570523503793:web:0a7ba7ce751eb95a3f6690",
-            measurementId: "G-H1NJ369HE9"
-        };
+        // --- ENVIRONMENT CONFIG (Mandatory for Preview) ---
+        let firebaseConfig;
+        try {
+            firebaseConfig = JSON.parse(__firebase_config);
+        } catch (e) {
+            console.warn("Using fallback config");
+            firebaseConfig = {
+                apiKey: "AIzaSyB0nHqdAw_dV9pHcQ_cSnWtNsn4CwwwUNc", // Fallback for UI visualization only
+                authDomain: "payboss-cafe-system.firebaseapp.com",
+                projectId: "payboss-cafe-system"
+            };
+        }
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
+        
+        // Use Global App ID for artifacts path
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
-        // State
-        let allOrdersToday = [];
-        let systemCashTotal = 0;
-        let systemQrisTotalFullDay = 0;
-        let chartInstance = null;
+        // --- HELPER: Strict Path Builder ---
+        // Semua data harus masuk ke sini agar tidak error permission
+        const getColRef = (colName) => collection(db, 'artifacts', appId, 'public', 'data', colName);
+        const getDocRef = (colName, docId) => doc(db, 'artifacts', appId, 'public', 'data', colName, docId);
 
-        // --- AUTH ---
+        // --- GLOBAL VARIABLES ---
+        let currentShiftData = null; // Menyimpan data modal & pengeluaran
+        let currentShiftSales = { cash: 0, qris: 0, orders: 0 }; // Menyimpan data penjualan
+        let charts = {};
+
+        // --- INIT ---
+        const todayStr = new Date().toISOString().split('T')[0];
+        document.getElementById('cash-date').value = todayStr;
+        document.getElementById('start-date').value = todayStr;
+        document.getElementById('end-date').value = todayStr;
+
+        // AUTH INITIALIZATION (Robust)
+        const initAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (err) {
+                console.warn("Auth failed, retrying anon:", err);
+                await signInAnonymously(auth);
+            }
+        };
+        initAuth();
+
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                document.getElementById('login-modal').classList.add('hidden');
-                document.getElementById('main-content').classList.remove('filter', 'blur-md', 'pointer-events-none');
-                initDailyDashboard();
-                
-                const todayStr = new Date().toISOString().slice(0,10);
-                document.getElementById('ana-start-date').value = todayStr;
-                document.getElementById('ana-end-date').value = todayStr;
-                document.getElementById('rep-start-date').value = todayStr;
-                document.getElementById('rep-end-date').value = todayStr;
-            } else {
-                document.getElementById('login-modal').classList.remove('hidden');
-                document.getElementById('main-content').classList.add('filter', 'blur-md', 'pointer-events-none');
+                document.getElementById('loading-overlay').classList.add('hidden');
+                console.log("Logged in as", user.uid);
             }
         });
 
-        document.getElementById('login-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btn = document.getElementById('btn-login'); btn.disabled = true; btn.textContent = "Verifying...";
-            try { await signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value); } 
-            catch (error) { document.getElementById('login-error').classList.remove('hidden'); btn.disabled = false; btn.textContent = "Masuk Dashboard"; }
-        });
-        document.getElementById('btn-logout').addEventListener('click', () => signOut(auth));
-
-        window.switchTab = function(tab) {
-            document.querySelectorAll('.tab-view').forEach(el => el.classList.add('hidden'));
-            document.getElementById('view-'+tab).classList.remove('hidden');
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            document.getElementById('tab-'+tab).classList.add('active');
-        }
-
-        function initDailyDashboard() {
-            const today = new Date(); today.setHours(0,0,0,0);
-            document.getElementById('header-date').textContent = today.toLocaleDateString('id-ID', {weekday: 'long', day:'numeric', month:'long'});
+        // --- NAVIGASI ---
+        window.switchPage = (pageName) => {
+            document.querySelectorAll('.page').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
             
-            // [PERBAIKAN UTAMA] Mengubah source collection dari 'orders' menjadi 'completedOrders'
-            // Kita gunakan 'completedAt' sebagai acuan waktu karena itu saat uang masuk
-            const q = query(collection(db, "completedOrders"), orderBy("completedAt", "desc"));
-            
-            onSnapshot(q, (snapshot) => {
-                allOrdersToday = [];
-                systemQrisTotalFullDay = 0;
-
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    // Gunakan completedAt, fallback ke createdAt jika data lama
-                    const timeField = data.completedAt || data.createdAt;
-                    if (!timeField) return;
-                    
-                    const orderDate = timeField.toDate();
-                    
-                    // Filter HANYA Hari Ini
-                    if (orderDate.setHours(0,0,0,0) === today.getTime()) {
-                        const formattedTime = timeField.toDate().toLocaleTimeString('id-ID', {hour12: false, hour: '2-digit', minute:'2-digit'});
-                        
-                        // Kita tambahkan rawDate untuk sorting/filtering lebih lanjut jika perlu
-                        allOrdersToday.push({ ...data, formattedTime: formattedTime, rawDate: timeField.toDate() });
-
-                        if((data.paymentMethod||'').toLowerCase().includes('qris')) systemQrisTotalFullDay += (data.total || 0);
-                    }
-                });
-
-                updateShiftCards();
-                updateBankPanel();
-                applyFilter(); 
-            }, (error) => { 
-                console.error(error);
-                if(error.code === 'permission-denied') alert("Gagal akses data. Cek Rules Database."); 
-            });
-
-            const qExp = query(collection(db, "bank_expenses"), orderBy("timestamp", "desc"));
-            onSnapshot(qExp, (snapshot) => {
-                const list = document.getElementById('bank-expense-list'); list.innerHTML = ''; let hasData = false;
-                snapshot.forEach(doc => {
-                    const d = doc.data();
-                    if(!d.timestamp) return;
-                    if(d.timestamp.toDate().setHours(0,0,0,0) === today.getTime()) {
-                        hasData = true;
-                        list.innerHTML += `<div class="flex justify-between text-xs bg-red-50 p-2 rounded border border-red-100 mb-1 items-center"><div><span class="font-bold text-slate-700 block">${d.desc}</span><span class="text-[10px] text-slate-400">${d.timestamp.toDate().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})}</span></div><span class="font-bold text-red-500">- Rp ${d.amount.toLocaleString('id-ID')}</span></div>`;
-                    }
-                });
-                if(!hasData) list.innerHTML = '<p class="text-xs text-gray-400 text-center italic mt-4">Belum ada pengeluaran hari ini.</p>';
-            });
-        }
-
-        // --- LOGIKA JAM SHIFT TERBARU (24 NOV REVISI) ---
-        function getShift(timeStr) {
-            // Shift 1: 08:00 - 15:59
-            if (timeStr >= '08:00' && timeStr < '16:00') return 's1';
-            // Shift 2: 16:00 - 22:59
-            if (timeStr >= '16:00' && timeStr < '23:00') return 's2';
-            // Shift 3: 23:00 - 23:59 ATAU 00:00 - 07:59
-            if (timeStr >= '23:00' || timeStr < '08:00') return 's3';
-            
-            return null;
-        }
-
-        function updateShiftCards() {
-            let s1={t:0,c:0,q:0}, s2={t:0,c:0,q:0}, s3={t:0,c:0,q:0};
-            allOrdersToday.forEach(o => {
-                const t = o.formattedTime; 
-                const amt = o.total||0; 
-                const isQris = (o.paymentMethod||'').toLowerCase().includes('qris');
-                const shift = getShift(t);
-
-                if (shift === 's1') { s1.t+=amt; isQris?s1.q+=amt:s1.c+=amt; }
-                else if (shift === 's2') { s2.t+=amt; isQris?s2.q+=amt:s2.c+=amt; }
-                else if (shift === 's3') { s3.t+=amt; isQris?s3.q+=amt:s3.c+=amt; }
-            });
-            
-            const fmt = n => `Rp ${n.toLocaleString('id-ID')}`;
-            document.getElementById('s1-total').innerText = fmt(s1.t); document.getElementById('s1-cash').innerText = s1.c.toLocaleString(); document.getElementById('s1-qris').innerText = s1.q.toLocaleString();
-            document.getElementById('s2-total').innerText = fmt(s2.t); document.getElementById('s2-cash').innerText = s2.c.toLocaleString(); document.getElementById('s2-qris').innerText = s2.q.toLocaleString();
-            document.getElementById('s3-total').innerText = fmt(s3.t); document.getElementById('s3-cash').innerText = s3.c.toLocaleString(); document.getElementById('s3-qris').innerText = s3.q.toLocaleString();
-        }
-
-        // CALCULATOR & FILTER
-        window.setShift = function(shiftCode, btn) {
-            document.getElementById('active-shift-filter').value = shiftCode;
-            
-            document.querySelectorAll('.shift-btn').forEach(b => {
-                b.classList.remove('bg-blue-600','text-white','shadow-md','border-blue-600'); 
-                b.classList.add('bg-white','text-slate-600','border-slate-200');
-            });
-            if(btn) { 
-                btn.classList.remove('bg-white','text-slate-600','border-slate-200'); 
-                btn.classList.add('bg-blue-600','text-white','shadow-md','border-blue-600'); 
-            }
-            applyFilter();
-        }
-
-        window.applyFilter = function() {
-            const shiftCode = document.getElementById('active-shift-filter').value;
-            
-            // Filter data sesuai shift yang dipilih
-            const filtered = allOrdersToday.filter(o => {
-                if (shiftCode === 'all') return true;
-                return getShift(o.formattedTime) === shiftCode;
-            });
-            
-            let cash = 0;
-            filtered.forEach(o => {
-                const isQris = (o.paymentMethod||'').toLowerCase().includes('qris');
-                if(!isQris) cash += (o.total||0);
-            });
-            
-            systemCashTotal = cash;
-            document.getElementById('system-cash-display').innerText = `Rp ${cash.toLocaleString('id-ID')}`;
-            calculateClosing();
-        }
-
-        window.calculateClosing = function() {
-            const modal = parseFloat(document.getElementById('input-modal-awal').value)||0;
-            const laci = parseFloat(document.getElementById('input-fisik-akhir').value)||0;
-            const bon = parseFloat(document.getElementById('input-pengeluaran').value)||0;
-            
-            const fisikBersih = (laci - modal) + bon;
-            const selisih = fisikBersih - systemCashTotal;
-            
-            document.getElementById('calculated-physical-revenue').innerText = `Rp ${fisikBersih.toLocaleString('id-ID')}`;
-            const elAmt = document.getElementById('variance-amount');
-            const elSts = document.getElementById('variance-status');
-            
-            elAmt.innerText = `Rp ${selisih.toLocaleString('id-ID')}`;
-            
-            if(document.getElementById('input-fisik-akhir').value === '') {
-                elAmt.className = "block font-black text-xl text-slate-400"; elSts.innerText = "Menunggu Input"; elSts.className = "text-[10px] bg-slate-200 px-2 py-0.5 rounded text-slate-500 font-bold";
-            } else if (selisih === 0) {
-                elAmt.className = "block font-black text-xl text-green-600"; elSts.innerText = "✅ KLOP (AMAN)"; elSts.className = "text-[10px] bg-green-100 px-2 py-0.5 rounded text-green-800 font-bold";
-            } else if (selisih < 0) {
-                elAmt.className = "block font-black text-xl text-red-600"; elSts.innerText = "⚠️ MINUS (KURANG)"; elSts.className = "text-[10px] bg-red-100 px-2 py-0.5 rounded text-red-800 font-bold";
+            if(pageName === 'cash') {
+                document.getElementById('cash-page').classList.remove('hidden');
+                document.querySelector('button[onclick="switchPage(\'cash\')"]').classList.add('active');
             } else {
-                elAmt.className = "block font-black text-xl text-blue-600"; elSts.innerText = "ℹ️ SURPLUS (LEBIH)"; elSts.className = "text-[10px] bg-blue-100 px-2 py-0.5 rounded text-blue-800 font-bold";
+                document.getElementById('analytics-page').classList.remove('hidden');
+                document.querySelector('button[onclick="switchPage(\'analytics\')"]').classList.add('active');
             }
-        }
-        window.resetCalculator = function() { document.getElementById('input-modal-awal').value=''; document.getElementById('input-fisik-akhir').value=''; document.getElementById('input-pengeluaran').value=''; calculateClosing(); }
-        
-        function updateBankPanel() {
-            const elSystem = document.getElementById('bank-qris-system');
-            const elNet = document.getElementById('est-net-receive');
-            if(elSystem) elSystem.innerText = `Rp ${systemQrisTotalFullDay.toLocaleString('id-ID')}`;
-            if(elNet) elNet.innerText = `Rp ${Math.round(systemQrisTotalFullDay * 0.993).toLocaleString('id-ID')}`;
-        }
+        };
 
-        window.submitBankExpense = async function(e) {
-            e.preventDefault();
-            const btn = document.getElementById('btn-save-expense'); btn.disabled=true; btn.innerText="...";
-            try {
-                await addDoc(collection(db, "bank_expenses"), {
-                    desc: document.getElementById('expense-desc').value,
-                    amount: parseFloat(document.getElementById('expense-amount').value),
-                    timestamp: serverTimestamp(),
-                    user: auth.currentUser.email
-                });
-                document.getElementById('expense-desc').value=''; document.getElementById('expense-amount').value='';
-                alert("Tersimpan!");
-            } catch(e) { alert("Gagal simpan: " + e.message); }
-            btn.disabled=false; btn.innerText="Simpan Catatan";
-        }
+        // ==========================================
+        // 1. LOGIKA SHIFT & KAS (CORE FEATURE)
+        // ==========================================
 
-        // --- ANALYTICS & REPORT LOGIC (TAB 2 & 3) ---
-        // [PERBAIKAN] Di sini juga harus query ke 'completedOrders'
-        window.loadHistoricalData = async function() {
-            const start = new Date(document.getElementById('ana-start-date').value);
-            const end = new Date(document.getElementById('ana-end-date').value);
-            end.setHours(23, 59, 59, 999);
+        document.getElementById('btn-load-shift').addEventListener('click', loadShiftReport);
 
-            const q = query(
-                collection(db, "completedOrders"), // <--- GANTI KE completedOrders
-                where("completedAt", ">=", Timestamp.fromDate(start)), // Gunakan completedAt
-                where("completedAt", "<=", Timestamp.fromDate(end)),
-                orderBy("completedAt", "desc") 
-            );
+        async function loadShiftReport() {
+            if (!auth.currentUser) return alert("Menunggu login...");
 
-            try {
-                const snapshot = await getDocs(q);
-                let itemCounts = {}; let hourlySales = new Array(24).fill(0);
-
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    // Gunakan completedAt jika ada, fallback createdAt
-                    const date = (data.completedAt || data.createdAt).toDate();
-                    hourlySales[date.getHours()] += (data.total || 0);
-                    if (data.items && Array.isArray(data.items)) {
-                        data.items.forEach(item => {
-                            const name = item.name + (item.variant ? ` (${item.variant})` : '');
-                            itemCounts[name] = (itemCounts[name] || 0) + (item.qty || 1);
-                        });
-                    }
-                });
-                updateCharts(hourlySales);
-                const sorted = Object.entries(itemCounts).sort((a,b)=>b[1]-a[1]).slice(0,10);
-                document.getElementById('top-items-list').innerHTML = sorted.length ? sorted.map(([n,c],i) => `<div class="flex justify-between p-2 border-b"><div class="flex gap-2"><span class="font-bold w-5">${i+1}</span><span>${n}</span></div><span class="bg-blue-100 px-2 rounded font-bold text-blue-700 text-xs">${c}x</span></div>`).join('') : '<p class="text-center text-sm text-gray-400 mt-4">Tidak ada data.</p>';
-            } catch (error) { alert("Error: " + error.message); }
-        }
-
-        function updateCharts(data) {
-            const ctx = document.getElementById('hourlyChart').getContext('2d');
-            if(chartInstance) chartInstance.destroy();
-            chartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: { labels: Array.from({length:24}, (_,i)=>`${String(i).padStart(2,'0')}:00`), datasets: [{ label: 'Total (Rp)', data: data, backgroundColor: '#3b82f6', borderRadius: 4 }] },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: {display:false} }, scales: { x: { grid:{display:false} }, y: { grid:{borderDash:[4,4]} } } }
-            });
-        }
-
-        // [PERBAIKAN] Report data juga harus dari completedOrders
-        window.loadReportData = async function() {
-            const start = new Date(document.getElementById('rep-start-date').value);
-            const end = new Date(document.getElementById('rep-end-date').value);
-            end.setHours(23, 59, 59, 999);
+            const dateStr = document.getElementById('cash-date').value;
+            const shiftId = document.getElementById('cash-shift').value;
+            const contentDiv = document.getElementById('shift-content');
             
-            const tbody = document.getElementById('report-table-body');
-            tbody.innerHTML = '<tr><td colspan="5" class="p-6 text-center italic text-slate-400">Memuat...</td></tr>';
+            contentDiv.classList.remove('hidden');
+            contentDiv.style.opacity = '0.5'; // Loading effect
 
-            const q = query(
-                collection(db, "completedOrders"), // <--- GANTI KE completedOrders
+            // 1. Tentukan Rentang Waktu Shift
+            let start, end;
+            const baseDate = new Date(dateStr);
+            
+            if (shiftId === '1') {
+                start = new Date(baseDate); start.setHours(8,0,0,0);
+                end = new Date(baseDate); end.setHours(15,59,59,999);
+            } else if (shiftId === '2') {
+                start = new Date(baseDate); start.setHours(16,0,0,0);
+                end = new Date(baseDate); end.setHours(22,59,59,999);
+            } else {
+                start = new Date(baseDate); start.setHours(23,0,0,0);
+                end = new Date(baseDate); end.setDate(end.getDate() + 1); end.setHours(7,59,59,999);
+            }
+
+            // 2. Ambil Data Penjualan (Completed Orders)
+            // UPDATED: Use Artifact Path to ensure it works in preview
+            const qSales = query(
+                getColRef("completedOrders"),
                 where("completedAt", ">=", Timestamp.fromDate(start)),
-                where("completedAt", "<=", Timestamp.fromDate(end)), 
-                orderBy("completedAt", "desc")
+                where("completedAt", "<=", Timestamp.fromDate(end))
             );
             
             try {
-                const snapshot = await getDocs(q);
-                let total = 0; let html = ''; let reportOrders = [];
-                snapshot.forEach(doc => {
-                    const d = doc.data();
-                    const timeField = d.completedAt || d.createdAt;
-                    const tStr = timeField.toDate().toLocaleTimeString('id-ID', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
-                    const iStr = (d.items||[]).map(i=>`${i.qty}x ${i.name}`).join(', ');
-                    reportOrders.push({...d, tStr, iStr});
-                    total += (d.total||0);
-                    html += `<tr class="hover:bg-slate-50 border-b"><td class="p-4 text-xs">${tStr}</td><td class="p-4 font-bold">${d.customer}</td><td class="p-4 text-xs truncate max-w-[150px]">${iStr}</td><td class="p-4">${d.paymentMethod}</td><td class="p-4 text-right font-bold">Rp ${(d.total||0).toLocaleString('id-ID')}</td></tr>`;
+                const salesSnap = await getDocs(qSales);
+                currentShiftSales = { cash: 0, qris: 0, orders: salesSnap.size };
+
+                salesSnap.forEach(doc => {
+                    const data = doc.data();
+                    const total = data.total || 0;
+                    const method = (data.paymentMethod || '').toLowerCase();
+                    
+                    if (method.includes('cash') || method.includes('tunai')) {
+                        currentShiftSales.cash += total;
+                    } else {
+                        currentShiftSales.qris += total;
+                    }
                 });
-                tbody.innerHTML = html || '<tr><td colspan="5" class="p-6 text-center italic text-slate-400">Tidak ada data.</td></tr>';
-                document.getElementById('report-total-sum').innerText = `Rp ${total.toLocaleString('id-ID')}`;
-                
-                // Attach data to window for export
-                window.currentReportData = reportOrders;
-            } catch (e) { alert("Error: " + e.message); }
+            } catch (e) {
+                console.error("Error fetching orders:", e);
+                // Fail gracefully
+                currentShiftSales = { cash: 0, qris: 0, orders: 0 };
+            }
+
+            // 3. Ambil Data Kas (Modal & Pengeluaran)
+            const reportId = `${dateStr}_SHIFT_${shiftId}`;
+            const reportRef = getDocRef("shiftReports", reportId);
+            
+            try {
+                const reportSnap = await getDoc(reportRef);
+
+                if (reportSnap.exists()) {
+                    currentShiftData = reportSnap.data();
+                    showShiftDashboard(); 
+                } else {
+                    currentShiftData = { id: reportId, date: dateStr, shift: shiftId, startCapital: 0, expenses: [] };
+                    showModalInput(); 
+                }
+            } catch (e) {
+                console.error("Error loading shift report:", e);
+                alert("Gagal memuat laporan. Coba refresh halaman.");
+            }
+
+            contentDiv.style.opacity = '1';
         }
 
-        window.downloadReportCSV = function() {
-            if (!window.currentReportData || window.currentReportData.length === 0) return alert("Tampilkan data dulu.");
-            let csv = "Waktu,Customer,Items,Metode,Total\n";
-            window.currentReportData.forEach(o => csv += `${o.tStr},"${o.customer}","${o.iStr}",${o.paymentMethod},${o.total}\n`);
-            const link = document.createElement("a");
-            link.href = "data:text/csv;charset=utf-8," + encodeURI(csv);
-            link.download = "Laporan_Payboss.csv";
-            link.click();
+        function showModalInput() {
+            document.getElementById('modal-input-section').classList.remove('hidden');
+            document.getElementById('shift-dashboard').classList.add('hidden');
         }
+
+        function showShiftDashboard() {
+            document.getElementById('modal-input-section').classList.add('hidden');
+            document.getElementById('shift-dashboard').classList.remove('hidden');
+            renderShiftCalculations();
+            renderExpenseList();
+        }
+
+        // --- SIMPAN MODAL AWAL ---
+        document.getElementById('btn-save-modal').addEventListener('click', async () => {
+            const amountInput = document.getElementById('input-modal').value;
+            const amount = parseInt(amountInput);
+            
+            if (isNaN(amount) || amount < 0) return alert("Masukkan nominal valid (minimal 0)");
+
+            const btn = document.getElementById('btn-save-modal');
+            btn.textContent = "Menyimpan...";
+            btn.disabled = true;
+
+            try {
+                currentShiftData.startCapital = amount;
+                const reportRef = getDocRef("shiftReports", currentShiftData.id);
+                await setDoc(reportRef, currentShiftData);
+                showShiftDashboard();
+            } catch (e) {
+                console.error(e);
+                alert("Gagal simpan modal.");
+            } finally {
+                btn.textContent = "Simpan";
+                btn.disabled = false;
+            }
+        });
+
+        // --- HITUNG LOGIKA UANG LACI ---
+        function renderShiftCalculations() {
+            const modal = currentShiftData.startCapital || 0;
+            const cashIn = currentShiftSales.cash || 0;
+            const totalExpenses = (currentShiftData.expenses || []).reduce((sum, item) => sum + item.amount, 0);
+            
+            const drawerTotal = modal + cashIn - totalExpenses;
+
+            document.getElementById('disp-modal').textContent = fmtRp(modal);
+            document.getElementById('disp-cash-in').textContent = "+ " + fmtRp(cashIn);
+            document.getElementById('disp-expenses').textContent = "- " + fmtRp(totalExpenses);
+            document.getElementById('disp-drawer-total').textContent = fmtRp(drawerTotal);
+            document.getElementById('disp-qris-in').textContent = fmtRp(currentShiftSales.qris);
+
+            const shiftName = document.getElementById('cash-shift').selectedOptions[0].text;
+            document.getElementById('shift-summary-text').innerHTML = `
+                <strong>${shiftName} (${currentShiftData.date})</strong><br>
+                Total Transaksi: ${currentShiftSales.orders} Pesanan<br>
+                Pendapatan Bersih (Cash+QRIS): ${fmtRp(cashIn + currentShiftSales.qris)}<br>
+                Pengeluaran Operasional: ${fmtRp(totalExpenses)}<br>
+                -----------------------------------<br>
+                <strong>Uang Fisik Wajib Setor: ${fmtRp(drawerTotal)}</strong>
+            `;
+        }
+
+        // --- TAMBAH PENGELUARAN (BON) ---
+        document.getElementById('btn-add-expense').addEventListener('click', async () => {
+            const desc = document.getElementById('exp-desc').value;
+            const amount = parseInt(document.getElementById('exp-amount').value);
+            
+            if (!desc || isNaN(amount) || amount <= 0) return alert("Isi keterangan dan nominal valid!");
+
+            const newExpense = {
+                desc: desc,
+                amount: amount,
+                time: new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})
+            };
+
+            const btn = document.getElementById('btn-add-expense');
+            btn.disabled = true; 
+            btn.textContent = "...";
+
+            try {
+                const reportRef = getDocRef("shiftReports", currentShiftData.id);
+                
+                // Optimistic Update
+                if(!currentShiftData.expenses) currentShiftData.expenses = [];
+                currentShiftData.expenses.push(newExpense);
+                
+                await updateDoc(reportRef, {
+                    expenses: currentShiftData.expenses 
+                });
+                
+                renderShiftCalculations();
+                renderExpenseList();
+                
+                document.getElementById('exp-desc').value = '';
+                document.getElementById('exp-amount').value = '';
+            } catch (e) {
+                console.error(e);
+                alert("Gagal catat pengeluaran.");
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "Catat";
+            }
+        });
+
+        function renderExpenseList() {
+            const list = document.getElementById('expense-history-list');
+            list.innerHTML = '';
+            (currentShiftData.expenses || []).forEach(exp => {
+                const div = document.createElement('div');
+                div.className = 'expense-item';
+                div.innerHTML = `
+                    <span><span class="expense-time">${exp.time}</span> ${exp.desc}</span>
+                    <span style="color:#c62828;">-${fmtRp(exp.amount)}</span>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        document.getElementById('btn-print-shift').addEventListener('click', () => {
+            const modal = currentShiftData.startCapital;
+            const cash = currentShiftSales.cash;
+            const exp = (currentShiftData.expenses || []).reduce((s, i) => s + i.amount, 0);
+            const drawer = modal + cash - exp;
+            
+            let text = "--- LAPORAN SHIFT ---\n";
+            text += `Tgl: ${currentShiftData.date}\n`;
+            text += `Shift: ${document.getElementById('cash-shift').selectedOptions[0].text}\n`;
+            text += "--------------------------------\n";
+            text += `Modal Awal     : ${fmtRp(modal)}\n`;
+            text += `Penjualan Cash : ${fmtRp(cash)}\n`;
+            text += `Penjualan QRIS : ${fmtRp(currentShiftSales.qris)}\n`;
+            text += `Pengeluaran    : (${fmtRp(exp)})\n`;
+            text += "--------------------------------\n";
+            text += `TOTAL UANG LACI: ${fmtRp(drawer)}\n`;
+            text += "--------------------------------\n";
+            text += "Rincian Pengeluaran:\n";
+            (currentShiftData.expenses || []).forEach(e => {
+                text += `- ${e.desc} (${fmtRp(e.amount)})\n`;
+            });
+            text += "\n\n";
+
+            window.open(`rawbt:${encodeURIComponent(text)}`, '_blank');
+        });
+
+
+        // ==========================================
+        // 2. LOGIKA ANALISIS (UPDATED TO ARTIFACT PATH)
+        // ==========================================
+        document.getElementById('load-analytics-btn').addEventListener('click', loadAnalytics);
+
+        async function loadAnalytics() {
+            const startStr = document.getElementById('start-date').value;
+            const endStr = document.getElementById('end-date').value;
+            
+            const start = new Date(startStr); start.setHours(0,0,0,0);
+            const end = new Date(endStr); end.setHours(23,59,59,999);
+
+            const q = query(getColRef("completedOrders"), 
+                where("completedAt", ">=", Timestamp.fromDate(start)),
+                where("completedAt", "<=", Timestamp.fromDate(end))
+            );
+
+            try {
+                const snap = await getDocs(q);
+                const orders = snap.docs.map(d => d.data());
+
+                const total = orders.reduce((s, o) => s + o.total, 0);
+                document.getElementById('anl-total-sales').textContent = fmtRp(total);
+                document.getElementById('anl-total-orders').textContent = orders.length;
+
+                const hours = Array(24).fill(0);
+                const days = Array(7).fill(0);
+                const combos = {};
+
+                orders.forEach(o => {
+                    const date = new Date(o.completedAt.seconds * 1000);
+                    hours[date.getHours()]++;
+                    days[date.getDay()]++;
+                    
+                    const items = [...new Set((o.items||[]).map(i => i.name))];
+                    if(items.length > 1) {
+                        for(let i=0; i<items.length; i++) {
+                            for(let j=i+1; j<items.length; j++) {
+                                const k = [items[i], items[j]].sort().join(' + ');
+                                combos[k] = (combos[k] || 0) + 1;
+                            }
+                        }
+                    }
+                });
+
+                renderCharts(hours, days);
+                
+                const sortedCombo = Object.entries(combos).sort(([,a],[,b]) => b-a).slice(0,5);
+                document.getElementById('combo-insight-list').innerHTML = sortedCombo.length 
+                    ? sortedCombo.map(([n,c]) => `<div class="combo-item"><span>${n}</span><strong>${c}x</strong></div>`).join('')
+                    : '<p style="text-align:center; color:#888;">Belum ada pola kombinasi.</p>';
+            } catch (e) {
+                console.error("Analytics error:", e);
+                alert("Gagal memuat analisis.");
+            }
+        }
+
+        function renderCharts(hData, dData) {
+            if(charts.hour) charts.hour.destroy();
+            if(charts.day) charts.day.destroy();
+
+            charts.hour = new Chart(document.getElementById('peakHourChart'), {
+                type: 'bar',
+                data: { labels: Array.from({length:24},(_,i)=>`${i}:00`), datasets: [{label:'Order', data:hData, backgroundColor:'#8B4513'}] },
+                options: { maintainAspectRatio: false, plugins:{legend:{display:false}}, scales:{x:{grid:{display:false}}} }
+            });
+
+            charts.day = new Chart(document.getElementById('peakDayChart'), {
+                type: 'bar',
+                data: { labels: ['Min','Sen','Sel','Rab','Kam','Jum','Sab'], datasets: [{label:'Order', data:dData, backgroundColor:'#D2B48C'}] },
+                options: { maintainAspectRatio: false, plugins:{legend:{display:false}}, scales:{x:{grid:{display:false}}} }
+            });
+        }
+
+        function fmtRp(n) { return "Rp " + (n||0).toLocaleString('id-ID'); }
+
     </script>
 </body>
 </html>
